@@ -18,7 +18,8 @@ public class MyGameGUI {
 	public MyGameGUI(DGraph t, List<String> r, List<String> f ) {
 		initRobots(r);
 		initFruits(f);
-		
+		fruitsEdges();
+		robotsPlace();
 	}
 	
 	private void initRobots(List<String> r) {

@@ -7,7 +7,7 @@ import utils.Point3D;
 
 public class Fruit {
    Point3D pos;
-   int type;
+   int type, src, dest;
    double value;
    
    public Fruit(String s) {
@@ -19,6 +19,22 @@ public class Fruit {
 	   } catch (JSONException e) {
 		  e.printStackTrace();
 	   }
+   }
+   
+   public void setSrc(int src) {
+	   this.src=src;
+   }
+   
+   public void setDest(int dest) {
+	   this.dest=dest;
+   }
+   
+   public int getSrc() {
+	   return src;
+   }
+   
+   public int getDest() {
+	   return dest;
    }
    
    public Point3D getPos() {
