@@ -21,7 +21,9 @@ public class Robot {
    public void getInfoFromJson(String s) {
 	   try {
 		JSONObject r= new  JSONObject(s);
-		id=(r.getInt("id"));
+		setSrc(r.getInt("src"));
+		setDest(r.getInt("dest"));
+		addValue(r.getDouble("value"));
 		
 	} catch (JSONException e) {
 		e.printStackTrace();
