@@ -42,6 +42,7 @@ public class MyGameGUI implements MouseListener {
 			e.printStackTrace();
 		}
 		initFruits(game.getFruits());
+		fruitsEdges();
 	}
 //	public MyGameGUI(DGraph t, List<String> r, List<String> f) {
 //		g=new DGraph(t);
@@ -74,8 +75,11 @@ public class MyGameGUI implements MouseListener {
 
 	private void fruitsEdges() {
 //		ArrayListg.getV();
-		for (Fruit fruit : f) {
-
+		List<Integer> nodes;
+		for(Fruit fruit: f) {
+			nodes=g.wherePoint(fruit.getPos());
+			fruit.setSrc(nodes.get(0));
+			fruit.setDest(nodes.get(1));
 		}
 	}
 
@@ -102,9 +106,8 @@ public class MyGameGUI implements MouseListener {
 		g = new DGraph();
 		game_service game = Game_Server.getServer(scenario_num);
 		g.init(game.getGraph());
-		initGUI();
 	}
-
+	
 	public void game() {
 		initGUI();
 	}
@@ -222,6 +225,14 @@ public class MyGameGUI implements MouseListener {
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public List<Robot> getRobots(){
+		return r;
+	}
+	
+	public List<Fruit> getFruits(){
+		return f;
 	}
 
 }

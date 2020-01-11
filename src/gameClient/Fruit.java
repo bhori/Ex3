@@ -51,4 +51,7 @@ public class Fruit {
    public double  getValue() {
 	   return value;
    }
+   public String toString() {
+	   return "pos: "+ pos + ", src: " + src + ", dest: " + dest + ", type: " + type + ", value: "+ value;
+   }
 }
