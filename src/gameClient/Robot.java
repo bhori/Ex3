@@ -8,9 +8,10 @@ import org.json.JSONObject;
 import utils.Point3D;
 
 public class Robot {
-   int id, src, dest;
-   double value, speed;
-   Point3D pos;
+   private int id, src, dest;
+   private double value, speed;
+   private Point3D pos;
+   
    public Robot() {
 	 
    }
@@ -48,6 +49,10 @@ public class Robot {
    
    public void setPos(String s) {
 	   this.pos=new Point3D(s);
+   }
+   
+   public void setPos(Point3D p) {
+	   this.pos=new Point3D(p);
    }
    
    public int getId() {

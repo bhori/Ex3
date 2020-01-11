@@ -6,9 +6,9 @@ import org.json.JSONObject;
 import utils.Point3D;
 
 public class Fruit {
-   Point3D pos;
-   int type;
-   double value;
+   private Point3D pos;
+   private int type;
+   private double value;
    
    public Fruit(String s) {
 	   try {
