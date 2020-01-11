@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONException;
@@ -26,13 +27,13 @@ public class MyGameGUI {
 	public static Color[] Colors = {Color.BLUE, Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.RED, Color.GREEN, Color.PINK};
 
 	
-//	public MyGameGUI(int scenario_num) {
-//		game = Game_Server.getServer(scenario_num);
-//		g=new DGraph();
-//		g.init(game.getGraph());
-//		initRobots(game.getRobots());
+	public MyGameGUI(int scenario_num) {
+		game = Game_Server.getServer(scenario_num);
+		g=new DGraph();
+		g.init(game.getGraph());
+		initRobots();
 //		initFruits(f);
-//	}
+	}
 
 	public MyGameGUI(DGraph t, List<String> r, List<String> f) {
 		g=new DGraph(t);
@@ -51,7 +52,7 @@ public class MyGameGUI {
 			}
 		}
 	}
-
+	
 	private void initFruits(List<String> f) {
 		for (int i = 0; i < f.size(); i++) {
 			this.f.add(new Fruit(f.get(i)));
@@ -84,6 +85,10 @@ public class MyGameGUI {
 	public void game(int scenario_num) {
 		game_service game = Game_Server.getServer(scenario_num);
 		g.init(game.getGraph());
+		initGUI();
+	}
+	
+	public void game2() {
 		initGUI();
 	}
 	
