@@ -27,6 +27,7 @@ public class MyGameGUI {
 
 	
 	public MyGameGUI(int scenario_num) {
+		g=new DGraph();
 		r=new ArrayList<Robot>();
 		f=new ArrayList<Fruit>();
 		game = Game_Server.getServer(scenario_num);
@@ -41,6 +42,7 @@ public class MyGameGUI {
 			e.printStackTrace();
 		}
 		initFruits(game.getFruits());
+		fruitsEdges();
 	}
 //	public MyGameGUI(DGraph t, List<String> r, List<String> f) {
 //		g=new DGraph(t);
@@ -75,8 +77,11 @@ public class MyGameGUI {
 
 	private void fruitsEdges() {
 //		ArrayListg.getV();
+		List<Integer> nodes;
 		for(Fruit fruit: f) {
-			
+			nodes=g.wherePoint(fruit.getPos());
+			fruit.setSrc(nodes.get(0));
+			fruit.setDest(nodes.get(1));
 		}
 	}
 
@@ -99,10 +104,9 @@ public class MyGameGUI {
 		}
 	}
 	
-	public void game(int scenario_num) {
-		g=new DGraph();
-		game_service game = Game_Server.getServer(scenario_num);
-		g.init(game.getGraph());
+	public void game() {
+//		game_service game = Game_Server.getServer(scenario_num);
+//		g.init(game.getGraph());
 		initGUI();
 	}
 	
@@ -186,13 +190,15 @@ public class MyGameGUI {
 			StdDraw.point(x, y);
 		}	
 	}
+	public List<Robot> getRobots(){
+		return r;
+	}
 	
+	public List<Fruit> getFruits(){
+		return f;
+	}
 	 public DGraph getGraph() {
 	    	return g;
 	    }
-	 public static void main(String[] args) {
-			MyGameGUI g=new MyGameGUI(2);
-			//g.game(3);
-		}
 
 }	
