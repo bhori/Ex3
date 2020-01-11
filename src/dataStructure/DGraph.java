@@ -278,22 +278,22 @@ public class DGraph implements graph, Serializable {
         return null;
 	}
 	
-	public List<Integer> wherePoint(Point3D p){
-		Collection<node_data> n=this.getV();
-		Collection<edge_data> e;
-		int src,dest;
-		List<Integer> l= new ArrayList<Integer>();
-		for(node_data t:n) {
-			src=t.getKey();
-			e=this.getE(src);
-			for(edge_data j:e) {
-				dest= j.getDest();
-				if(p.x()<= t.getLocation().x() && p.x()>= this.getNode(dest).getLocation().x()
-						|| (p.x()>= t.getLocation().x() && p.x()<= this.getNode(dest).getLocation().x() )) {
-					//if()
-				}
-			}
-		}
-	}
+//	public List<Integer> wherePoint(Point3D p){
+//		Collection<node_data> n=this.getV();
+//		Collection<edge_data> e;
+//		int src,dest;
+//		List<Integer> l= new ArrayList<Integer>();
+//		for(node_data t:n) {
+//			src=t.getKey();
+//			e=this.getE(src);
+//			for(edge_data j:e) {
+//				dest= j.getDest();
+//				if(p.x()<= t.getLocation().x() && p.x()>= this.getNode(dest).getLocation().x()
+//						|| (p.x()>= t.getLocation().x() && p.x()<= this.getNode(dest).getLocation().x() )) {
+//					//if()
+//				}
+//			}
+//		}
+//	}
 
 }

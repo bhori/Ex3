@@ -11,7 +11,12 @@ public class Main {
 		DGraph g = new DGraph();
 		MyGameGUI s = new MyGameGUI(g, game.getRobots(), game.getFruits());
 //		MyGameGUI s = new MyGameGUI();
+		System.out.println(game.getRobots());
 		s.game(2);
+		System.out.println(s.getGraph().getEdge(9, 10));
+		System.out.println(s.getGraph().getEdge(10, 9));
+		System.out.println(s.getGraph().getEdge(4, 5));
+		System.out.println(s.getGraph().getEdge(2, 1));
 	}
 
 }
