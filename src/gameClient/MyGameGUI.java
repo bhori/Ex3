@@ -21,8 +21,8 @@ import utils.StdDraw;
 
 public class MyGameGUI {
 	private DGraph g;
-	private ArrayList<Robot> r;
-	private ArrayList<Fruit> f;
+	private List<Robot> r;
+	private List<Fruit> f;
 	private game_service game;
 	public static Color[] Colors = {Color.BLUE, Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.RED, Color.GREEN, Color.PINK};
 
@@ -31,25 +31,41 @@ public class MyGameGUI {
 		game = Game_Server.getServer(scenario_num);
 		g=new DGraph();
 		g.init(game.getGraph());
-		initRobots();
-//		initFruits(f);
+		r=new ArrayList<Robot>();
+		f=new ArrayList<Fruit>();
+		g=new DGraph();
+		g.init(game.getGraph());
+		try {
+		JSONObject line= new JSONObject(game.toString());
+		JSONObject info = line.getJSONObject("GameServer");
+		initRobots(info);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		initFruits(game.getFruits());
 	}
+//	public MyGameGUI(DGraph t, List<String> r, List<String> f) {
+//		g=new DGraph(t);
+//		initRobots(r);
+////		initFruits(f);
+//
+//	}
+//	public MyGameGUI(DGraph t, List<String> r, List<String> f) {
+//		g=new DGraph(t);
+//		initRobots(r);
+////		initFruits(f);
+//	}
 
-	public MyGameGUI(DGraph t, List<String> r, List<String> f) {
-		g=new DGraph(t);
-		initRobots(r);
-//		initFruits(f);
-	}
-
-	private void initRobots(List<String> r) {
-		JSONObject o;
-		for (int i = 0; i < r.size(); i++) {
-			try {
-				o = new JSONObject(r.get(i));
-				this.r.add(new Robot(o.getInt("id")));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+	private void initRobots(JSONObject r) {
+		try {
+		int sumRobots=r.getInt("robots");
+		for(int i=0; i<sumRobots; i++) {	
+				this.r.add(new Robot(i));
+		}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -60,7 +76,10 @@ public class MyGameGUI {
 	}
 
 	private void fruitsEdges() {
-
+//		ArrayListg.getV();
+		for(Fruit fruit: f) {
+			
+		}
 	}
 
 	private void robotsPlace() {
@@ -83,6 +102,7 @@ public class MyGameGUI {
 	}
 	
 	public void game(int scenario_num) {
+		g=new DGraph();
 		game_service game = Game_Server.getServer(scenario_num);
 		g.init(game.getGraph());
 		initGUI();
@@ -176,5 +196,9 @@ public class MyGameGUI {
 	 public DGraph getGraph() {
 	    	return g;
 	    }
+	 public static void main(String[] args) {
+			MyGameGUI g=new MyGameGUI(2);
+			//g.game(3);
+		}
 
 }	

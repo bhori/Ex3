@@ -6,19 +6,38 @@ import org.json.JSONObject;
 import utils.Point3D;
 
 public class Fruit {
+   
    private Point3D pos;
-   private int type;
+   private int type, src, dest;
    private double value;
+
    
    public Fruit(String s) {
 	   try {
-		JSONObject f= new JSONObject(s);
-		pos= new Point3D(s);
+		JSONObject t= new JSONObject(s);
+		JSONObject f= t.getJSONObject("Fruit");
+		pos= new Point3D(f.getString("pos"));
 		type= f.getInt("type");
 		value= f.getDouble("value");
 	   } catch (JSONException e) {
 		  e.printStackTrace();
 	   }
+   }
+   
+   public void setSrc(int src) {
+	   this.src=src;
+   }
+   
+   public void setDest(int dest) {
+	   this.dest=dest;
+   }
+   
+   public int getSrc() {
+	   return src;
+   }
+   
+   public int getDest() {
+	   return dest;
    }
    
    public Point3D getPos() {
