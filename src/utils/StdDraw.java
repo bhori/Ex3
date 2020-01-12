@@ -735,6 +735,13 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		menu2.add(menuItem4);
 		return menuBar;
 	}
+	
+	public static void addMouseListener (MouseListener Listener) {
+		ImageIcon icon = new ImageIcon(onscreenImage);
+		JLabel draw = new JLabel(icon);
+		draw.addMouseListener(Listener);
+		frame.setContentPane(draw);
+	}
 
 	/***************************************************************************
 	 * User and screen coordinate systems.
@@ -819,27 +826,27 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 
 	// helper functions that scale from user coordinates to screen coordinates and
 	// back
-	private static double scaleX(double x) {
+	public static double scaleX(double x) {
 		return width * (x - xmin) / (xmax - xmin);
 	}
 
-	private static double scaleY(double y) {
+	public static double scaleY(double y) {
 		return height * (ymax - y) / (ymax - ymin);
 	}
 
-	private static double factorX(double w) {
+	public static double factorX(double w) {
 		return w * width / Math.abs(xmax - xmin);
 	}
 
-	private static double factorY(double h) {
+	public static double factorY(double h) {
 		return h * height / Math.abs(ymax - ymin);
 	}
 
-	private static double userX(double x) {
+	public static double userX(double x) {
 		return xmin + x * (xmax - xmin) / width;
 	}
 
-	private static double userY(double y) {
+	public static double userY(double y) {
 		return ymax - y * (ymax - ymin) / height;
 	}
 
