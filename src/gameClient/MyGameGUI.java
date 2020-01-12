@@ -11,7 +11,9 @@ import org.json.JSONObject;
 
 import Server.Game_Server;
 import Server.game_service;
+import algorithms.Graph_Algo;
 import dataStructure.DGraph;
+import dataStructure.Edge;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
@@ -77,11 +79,20 @@ public class MyGameGUI {
 
 	private void fruitsEdges() {
 //		ArrayListg.getV();
-		List<Integer> nodes;
+		edge_data e;
+		Graph_Algo graph=new Graph_Algo(g);
 		for(Fruit fruit: f) {
-			nodes=g.wherePoint(fruit.getPos());
-			fruit.setSrc(nodes.get(0));
-			fruit.setDest(nodes.get(1));
+			e=graph.findEdgeToPoint(fruit.getPos());
+			System.out.println(e);
+			if(fruit.getType()==-1) {
+				fruit.setSrc(Math.max(e.getSrc(), e.getDest()));
+				fruit.setDest(Math.min(e.getSrc(), e.getDest()));
+			}
+			else {
+				fruit.setSrc(Math.min(e.getSrc(), e.getDest()));
+				fruit.setDest(Math.max(e.getSrc(), e.getDest()));
+			}
+			
 		}
 	}
 

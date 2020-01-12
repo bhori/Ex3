@@ -19,6 +19,7 @@ public class Main {
 		System.out.println(s.getGraph().getEdge(4, 5));
 		System.out.println(s.getGraph().getEdge(2, 1));
 		System.out.println(s.getFruits());
+		System.out.println(s.getRobots());
 	}
 
 }
