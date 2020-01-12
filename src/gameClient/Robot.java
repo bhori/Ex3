@@ -78,4 +78,8 @@ public class Robot {
    public Point3D getPos() {
 	   return pos;
    }
+   
+   public String toString() {
+	   return "id: " +id +  ", pos: " + pos+  ", src: "+ src + ", dest: "+ dest + ", value: " + value+ ", speed: "+ speed;   
+   }
 }

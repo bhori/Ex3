@@ -24,8 +24,10 @@ import org.json.JSONObject;
 
 import Server.Game_Server;
 import Server.game_service;
+import algorithms.Graph_Algo;
 import dataStructure.DGraph;
 import dataStructure.Node;
+import dataStructure.Edge;
 import dataStructure.edge_data;
 import dataStructure.node_data;
 import utils.Point3D;
@@ -93,15 +95,19 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	}
 
 	private void fruitsEdges() {
-		List<Integer> nodes;
-		for (Fruit fruit : f) {
-			nodes = g.wherePoint(fruit.getPos());
-			if (fruit.getType() == 1) {
-				fruit.setSrc(nodes.get(0));
-				fruit.setDest(nodes.get(1));
-			} else {
-				fruit.setSrc(nodes.get(1));
-				fruit.setDest(nodes.get(0));
+//		ArrayListg.getV();
+		edge_data e;
+		Graph_Algo graph=new Graph_Algo(g);
+		for(Fruit fruit: f) {
+			e=graph.findEdgeToPoint(fruit.getPos());
+			System.out.println(e);
+			if(fruit.getType()==-1) {
+				fruit.setSrc(Math.max(e.getSrc(), e.getDest()));
+				fruit.setDest(Math.min(e.getSrc(), e.getDest()));
+			}
+			else {
+				fruit.setSrc(Math.min(e.getSrc(), e.getDest()));
+				fruit.setDest(Math.max(e.getSrc(), e.getDest()));
 			}
 		}
 	}

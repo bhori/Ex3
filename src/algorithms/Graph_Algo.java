@@ -7,11 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import dataStructure.DGraph;
+import dataStructure.Edge;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
 
 import utils.MyMinHeap;
+import utils.Point3D;
 /**
  * This  class represents the set of graph-theory algorithms.
  *
@@ -331,6 +333,27 @@ public class Graph_Algo implements graph_algorithms {
 		    	else n.setTag(0);
 		    }
 		 return allNodesChanged;
+	}
+	public edge_data findEdgeToPoint(Point3D p){
+		Collection<node_data> n=this.g.getV();
+		Collection<edge_data> e;
+		int dest;
+		for(node_data t:n) {
+			e=this.g.getE(t.getKey());
+			for(edge_data j:e) {
+				dest= j.getDest();
+//				if(p.x()<= t.getLocation().x() && p.x()>= this.getNode(dest).getLocation().x()
+//						|| (p.x()>= t.getLocation().x() && p.x()<= this.getNode(dest).getLocation().x() )) {
+//					if()
+//				}
+				if((Math.abs((t.getLocation().distance2D(p)+this.g.getNode(dest).getLocation().distance2D(p))
+					- t.getLocation().distance2D(this.g.getNode(dest).getLocation()))<=Point3D.EPS)) {
+					return j;
+				}
+				
+			}
+		}
+	    return null;
 	}
 
 
