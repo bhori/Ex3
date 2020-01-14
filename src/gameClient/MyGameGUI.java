@@ -29,18 +29,23 @@ import dataStructure.DGraph;
 import dataStructure.Node;
 import dataStructure.Edge;
 import dataStructure.edge_data;
+import dataStructure.graph;
 import dataStructure.node_data;
 import utils.Point3D;
 import utils.Range;
 import utils.StdDraw;
 
-public class MyGameGUI implements ActionListener, MouseListener {
+public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 	private DGraph g;
 	private List<Robot> r;
 	private List<Fruit> f;
 	private game_service game;
-	private double nodePenRadius = 0.03;
+	private double nodePenRadius = 0.03, pixel;
 	private boolean isManualGame;
+	private int numOfRobots;
+	private Range rx;
+	private Range ry;
+	private Thread t;
 	public static Color[] Colors = { Color.RED, Color.CYAN, Color.ORANGE, Color.PINK, Color.MAGENTA, Color.GREEN,
 			Color.BLUE };
 
@@ -57,6 +62,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		try {
 			JSONObject line = new JSONObject(game.toString());
 			JSONObject info = line.getJSONObject("GameServer");
+//			numOfRobots=info.getInt("robots");
 			initRobots(info);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -97,15 +103,13 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	private void fruitsEdges() {
 //		ArrayListg.getV();
 		edge_data e;
-		Graph_Algo graph=new Graph_Algo(g);
-		for(Fruit fruit: f) {
-			e=graph.findEdgeToPoint(fruit.getPos());
-			System.out.println(e);
-			if(fruit.getType()==-1) {
+		Graph_Algo graph = new Graph_Algo(g);
+		for (Fruit fruit : f) {
+			e = graph.findEdgeToPoint(fruit.getPos());
+			if (fruit.getType() == -1) {
 				fruit.setSrc(Math.max(e.getSrc(), e.getDest()));
 				fruit.setDest(Math.min(e.getSrc(), e.getDest()));
-			}
-			else {
+			} else {
 				fruit.setSrc(Math.min(e.getSrc(), e.getDest()));
 				fruit.setDest(Math.max(e.getSrc(), e.getDest()));
 			}
@@ -149,6 +153,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		try {
 			JSONObject line = new JSONObject(game.toString());
 			JSONObject info = line.getJSONObject("GameServer");
+			numOfRobots = info.getInt("robots");
 			initRobots(info);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -165,58 +170,55 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	private void initStartGUI() {
 		StdDraw.setCanvasSize(1000, 600);
 		StdDraw.setJMenuBar(createMenuBar());
+		StdDraw.addMouseListener(this);
+		StdDraw.enableDoubleBuffering();
 	}
 
 	private void initGUI() {
-		StdDraw.setCanvasSize(1000, 600);
-		StdDraw.setJMenuBar(createMenuBar());
-		StdDraw.addMouseListener(this);
-		Range rx = get_x_Range();
-		Range ry = get_y_Range();
-		StdDraw.setXscale(rx.get_min() - 5, rx.get_max() + 5);
-		StdDraw.setYscale(ry.get_min() - 5, ry.get_max() + 5);
+//		StdDraw.setCanvasSize(1000, 600);
+//		StdDraw.setJMenuBar(createMenuBar());
+//		StdDraw.addMouseListener(this);
+		rx = get_x_Range();
+		ry = get_y_Range();
+		pixel = rx.get_length() / 100;
+		double rX = rx.get_length() / 20;
+		double rY = ry.get_length() / 15;
+//		StdDraw.setXscale(rx.get_min() - 5, rx.get_max() + 5);
+//		StdDraw.setYscale(ry.get_min() - 5, ry.get_max() + 5);
+		StdDraw.setXscale(rx.get_min() - rX, rx.get_max() + rX);
+		StdDraw.setYscale(ry.get_min() - rY, ry.get_max() + rY);
 		drawFruits();
 		drawGraph();
+		StdDraw.show();
+//		StdDraw.clear();
 //		StdDraw.addMouseListener(this);
 	}
 
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
-		JMenu menu1 = new JMenu("File");
-		JMenu menu2 = new JMenu("Algorithms");
-		JMenu menu3 = new JMenu("Game");
-		menuBar.add(menu1);
-		menuBar.add(menu2);
-		menuBar.add(menu3);
-		JMenuItem menuItem1 = new JMenuItem("Save");
-		JMenuItem menuItem2 = new JMenuItem("Load");
-		JMenuItem menuItem3 = new JMenuItem("ShortestPath");
-		JMenuItem menuItem4 = new JMenuItem("TSP");
-		JMenuItem menuItem5 = new JMenuItem("IsConnected");
-		JMenuItem menuItem6 = new JMenuItem("Select scenario");
-		menuItem1.addActionListener(this);
-		menuItem2.addActionListener(this);
-		menuItem3.addActionListener(this);
-		menuItem4.addActionListener(this);
-		menuItem5.addActionListener(this);
-		menuItem6.addActionListener(this);
-		menu1.add(menuItem1);
-		menu1.add(menuItem2);
-		menu2.add(menuItem5);
-		menu2.add(menuItem3);
-		menu2.add(menuItem4);
-		menu3.add(menuItem6);
+		JMenu menu = new JMenu("Game");
+		menuBar.add(menu);
+		JMenuItem menuItem = new JMenuItem("Select scenario");
+		menuItem.addActionListener(this);
+		menu.add(menuItem);
 		return menuBar;
 	}
 
 	private Range get_x_Range() {
 		double minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
 		Collection<node_data> nodes = g.getV();
+//		for (node_data n : nodes) {
+//			if (n.getLocation().x() * 2500 < minX) {
+//				minX = n.getLocation().x() * 2500;
+//			} else if (n.getLocation().x() * 2500 > maxX) {
+//				maxX = n.getLocation().x() * 2500;
+//			}
+//		}
 		for (node_data n : nodes) {
-			if (n.getLocation().x() * 2500 < minX) {
-				minX = n.getLocation().x() * 2500;
-			} else if (n.getLocation().x() * 2500 > maxX) {
-				maxX = n.getLocation().x() * 2500;
+			if (n.getLocation().x() < minX) {
+				minX = n.getLocation().x();
+			} else if (n.getLocation().x() > maxX) {
+				maxX = n.getLocation().x();
 			}
 		}
 		Range rx = new Range(minX, maxX);
@@ -226,11 +228,18 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	private Range get_y_Range() {
 		double minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
 		Collection<node_data> nodes = g.getV();
+//		for (node_data n : nodes) {
+//			if (n.getLocation().y() * 2500 < minY) {
+//				minY = n.getLocation().y() * 2500;
+//			} else if (n.getLocation().y() * 2500 > maxY) {
+//				maxY = n.getLocation().y() * 2500;
+//			}
+//		}
 		for (node_data n : nodes) {
-			if (n.getLocation().y() * 2500 < minY) {
-				minY = n.getLocation().y() * 2500;
-			} else if (n.getLocation().y() * 2500 > maxY) {
-				maxY = n.getLocation().y() * 2500;
+			if (n.getLocation().y() < minY) {
+				minY = n.getLocation().y();
+			} else if (n.getLocation().y() > maxY) {
+				maxY = n.getLocation().y();
 			}
 		}
 		Range ry = new Range(minY, maxY);
@@ -239,29 +248,38 @@ public class MyGameGUI implements ActionListener, MouseListener {
 
 	private void manualGame() {
 //		StdDraw.addMouseListener(this);
+		game.startGame();
 	}
 
 	private void automaticGame() {
 		robotsPlace();
 		drawRobots();
+//		game.startGame();
+//		t = new Thread(this);
+//		t.start();
 	}
 
 	private void drawGraph() {
 		double x0, x1, y0, y1, directX, directY;
 		Collection<node_data> nodes = g.getV();
 		for (node_data i : nodes) {
-			x0 = g.getNode(i.getKey()).getLocation().x() * 2500;
-			y0 = g.getNode(i.getKey()).getLocation().y() * 2500;
+//			x0 = g.getNode(i.getKey()).getLocation().x() * 2500;
+//			y0 = g.getNode(i.getKey()).getLocation().y() * 2500;
+			x0 = g.getNode(i.getKey()).getLocation().x();
+			y0 = g.getNode(i.getKey()).getLocation().y();
 			StdDraw.setPenColor(Color.BLUE);
 			StdDraw.setPenRadius(0.003);
-			StdDraw.text(x0, y0 + 0.5, "" + i.getKey());
+			StdDraw.text(x0, y0 + pixel, "" + i.getKey());
 //			StdDraw.setPenColor(Color.BLUE);
 			StdDraw.setPenRadius(nodePenRadius);
 			StdDraw.point(x0, y0);
+//			StdDraw.filledCircle(x0, y0, rx.get_length()/200);
 			Collection<edge_data> edges = g.getE(i.getKey());
 			for (edge_data j : edges) {
-				x1 = g.getNode(j.getDest()).getLocation().x() * 2500;
-				y1 = g.getNode(j.getDest()).getLocation().y() * 2500;
+				x1 = g.getNode(j.getDest()).getLocation().x();
+				y1 = g.getNode(j.getDest()).getLocation().y();
+//				x1 = g.getNode(j.getDest()).getLocation().x() * 2500;
+//				y1 = g.getNode(j.getDest()).getLocation().y() * 2500;
 				directX = (9 * x1 + x0) / 10;
 				directY = (9 * y1 + y0) / 10;
 				StdDraw.setPenColor(Color.YELLOW);
@@ -270,7 +288,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 				StdDraw.setPenColor(Color.BLACK);
 				StdDraw.setPenRadius(0.003);
 				StdDraw.line(x0, y0, x1, y1);
-				StdDraw.text((x0 + 2 * x1) / 3, (y0 + 2 * y1) / 3 + 0.3,
+				StdDraw.text((x0 + 2 * x1) / 3, (y0 + 2 * y1) / 3 + pixel,
 						"" + new DecimalFormat("0.0").format(j.getWeight()));
 			}
 		}
@@ -303,36 +321,101 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		}
 	}
 
+	private void moveRobots(game_service game, graph gg) {
+
+	}
+
+	private int nextNode(graph g, int src) {
+		return 0;
+	}
+
 	public DGraph getGraph() {
 		return g;
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		double x_location = StdDraw.userX(e.getX())/2500;
-		double y_location = StdDraw.userY(e.getY())/2500;
+//		double x_location = StdDraw.userX(e.getX())/2500;
+//		double y_location = StdDraw.userY(e.getY())/2500;
+		double x_location = StdDraw.userX(e.getX());
+		double y_location = StdDraw.userY(e.getY());
 //		double x_location = StdDraw.mouseX();
 //		double y_location = StdDraw.mouseY();
 		node_data n = new Node();
+		int robotsOnGraph = 0;
 		System.out.println(x_location + ", " + y_location);
 		if (isManualGame) {
-			for (Robot robot : r) {
-				n = findNode(x_location, y_location);
-				if(n!=null) {
-					robot.setPos(n.getLocation());
-					drawRobot(robot.getPos().x(), robot.getPos().y(), robot.getId());
+			n = findNode(x_location, y_location);
+			if (n != null) {
+				if (robotsOnGraph < numOfRobots) {
+					r.get(robotsOnGraph).setPos(n.getLocation());
+					game.addRobot(r.get(robotsOnGraph).getId());
+					drawRobot(r.get(robotsOnGraph).getPos().x(), r.get(robotsOnGraph).getPos().y(),r.get(robotsOnGraph).getId());
+					robotsOnGraph++;
+				}else {
+//					game.startGame();
+					isManualGame = false;
 				}
 			}
-			isManualGame=false;
+//			for (Robot robot : r) {
+//				robotPlace(x_location, y_location);
+//				x_location = StdDraw.userX(e.getX())/2500;
+//				y_location = StdDraw.userY(e.getY())/2500;
+//				n=null;
+//				n = findNode(x_location, y_location);
+//				while(n==null) {
+//					StdDraw.addMouseListener(this);
+//					n = findNode(x_location, y_location);
+//				}
+//				if(n!=null) {
+//				robot.setPos(n.getLocation());
+//				drawRobot(robot.getPos().x(), robot.getPos().y(), robot.getId());
+//				}
+//			}
+//			isManualGame = false;
 		}
 
 	}
-	
+
+//	private void robotPlace(double x, double y) {
+//		node_data n = new Node();
+//		for (Robot robot : r) {
+////			x = StdDraw.userX(e.getX())/2500;
+////			y = StdDraw.userY(e.getY())/2500;
+////			n=null;
+//			n = findNode(x, y);
+//			while(n==null) {
+////				StdDraw.addMouseListener(this);
+//				n = findNode(x, y);
+//			}
+////			if(n!=null) {
+//			robot.setPos(n.getLocation());
+//			drawRobot(robot.getPos().x(), robot.getPos().y(), robot.getId());
+////			}
+//		}
+//	}
+
 	private void drawRobot(double x, double y, int id) {
+//		int c = id % Colors.length;
+		drawFruits();
+		drawGraph();
+		for (int i = 0; i <= id; i++) {
+			int c = id % Colors.length;
+			StdDraw.setPenColor(Colors[c]);
+			StdDraw.setPenRadius(0.05);
+			StdDraw.point(r.get(i).getPos().x(), r.get(i).getPos().y());
+		}
+//		drawRobot2(x, y, id);
+//		StdDraw.setPenColor(Colors[c]);
+//		StdDraw.setPenRadius(0.05);
+//		StdDraw.point(x, y);
+		StdDraw.show();
+		StdDraw.clear();
+	}
+	
+	private void drawRobot2(double x, double y, int id) {
 		int c = id % Colors.length;
 		StdDraw.setPenColor(Colors[c]);
-		x = x * 2500;
-		y = y * 2500;
 		StdDraw.setPenRadius(0.05);
 		StdDraw.point(x, y);
 	}
@@ -341,8 +424,8 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		Point3D p = new Point3D(x, y);
 //		double radius = nodePenRadius;
 		for (node_data n : g.getV()) {
-			System.out.println(n.getLocation().x()+", "+n.getLocation().y());
-			if (p.distance2D(n.getLocation()) <= nodePenRadius) {
+//			System.out.println(n.getLocation().x()+", "+n.getLocation().y());
+			if (p.distance2D(n.getLocation()) <= 0.0003) {
 				return n;
 			}
 		}
@@ -413,6 +496,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 //						s.game();
 						game(scenario_num);
 						window.setVisible(false);
+//						StdDraw.show();
 						selectGameOption();
 					} catch (Exception e2) {
 						JOptionPane.showMessageDialog(null, e2 + "");
@@ -445,6 +529,9 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		window.add(Automatic);
 		window.setSize(400, 200);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		StdDraw.show();
+//		StdDraw.enableDoubleBuffering();
+//		StdDraw.show();
 		window.setVisible(true);
 
 		manual.addActionListener(new ActionListener() {
@@ -464,6 +551,15 @@ public class MyGameGUI implements ActionListener, MouseListener {
 				window.setVisible(false);
 			}
 		});
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			synchronized (this) {
+				StdDraw.text(35 * 2500, 32 * 2500, "" + game.timeToEnd());
+			}
+		}
 	}
 
 }
