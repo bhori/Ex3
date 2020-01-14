@@ -19,12 +19,13 @@ public class Robot {
 	   this.id=id;
    }
    
-   public void getInfoFromJson(String s) {
+   public void getInfoFromJson(JSONObject r) {
 	   try {
-		JSONObject r= new  JSONObject(s);
 		setSrc(r.getInt("src"));
 		setDest(r.getInt("dest"));
-		addValue(r.getDouble("value"));
+		setValue(r.getDouble("value"));
+		setPos(r.getString("pos"));
+		setSpeed(r.getDouble("speed"));
 		
 	} catch (JSONException e) {
 		e.printStackTrace();
@@ -39,8 +40,8 @@ public class Robot {
 	   this.dest=dest;
    }
    
-   public void addValue(double value) {
-	   this.value+=value;
+   public void setValue(double value) {
+	   this.value=value;
    }
    
    public void setSpeed(double speed) {

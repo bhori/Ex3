@@ -69,7 +69,7 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 		}
 		initFruits(game.getFruits());
 		fruitsEdges();
-//		robotsPlace();
+		robotsPlace();
 	}
 //	public MyGameGUI(DGraph t, List<String> r, List<String> f) {
 //		g=new DGraph(t);
@@ -82,7 +82,7 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 //		initRobots(r);
 ////		initFruits(f);
 //	}
-
+	
 	private void initRobots(JSONObject r) {
 		try {
 			int sumRobots = r.getInt("robots");
@@ -141,9 +141,30 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 				robot.setPos(p);
 				i++;
 			}
+			this.game.addRobot(node_id);
 		}
 	}
-
+	public void updateFruits(List<String> f) {
+		this.f.clear();
+		initFruits(f);
+		fruitsEdges();
+	}
+	public void updateRobots(List<String> r) {
+		Robot robot;
+		for(int i=0;i<r.size();i++) {
+			String robot_json = r.get(i);
+			try {
+				JSONObject line = new JSONObject(robot_json);
+				JSONObject ttt = line.getJSONObject("Robot");
+				robot=this.getRobot(ttt.getInt("id"));
+				robot.getInfoFromJson(ttt);
+				robot.setDest(-1);
+	        }
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	public void game(int scenario_num) {
 		game = Game_Server.getServer(scenario_num);
 		g = new DGraph();
@@ -459,9 +480,21 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 	public List<Robot> getRobots() {
 		return r;
 	}
+	
+	public Robot getRobot(int id) {
+		for(int i=0; i<r.size(); i++) {
+			if(r.get(i).getId()==id)
+				return r.get(i);
+		}
+		return null;
+	}
 
 	public List<Fruit> getFruits() {
 		return f;
+	}
+	
+	public game_service getGame() {
+		return game;
 	}
 
 	@Override

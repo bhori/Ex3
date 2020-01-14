@@ -3,6 +3,8 @@ package gameClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dataStructure.Edge;
+import dataStructure.edge_data;
 import utils.Point3D;
 
 public class Fruit {
@@ -10,6 +12,7 @@ public class Fruit {
    private Point3D pos;
    private int type, src, dest;
    private double value;
+   private edge_data e;
 
    
    public Fruit(String s) {
@@ -23,7 +26,9 @@ public class Fruit {
 		  e.printStackTrace();
 	   }
    }
-   
+   public void setEdge(edge_data e) {
+	   this.e=e;
+   }
    public void setSrc(int src) {
 	   this.src=src;
    }

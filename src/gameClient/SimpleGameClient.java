@@ -83,6 +83,7 @@ public class SimpleGameClient {
 		List<String> log = game.move();
 		if(log!=null) {
 			long t = game.timeToEnd();
+//			System.out.println("log: "+ log);
 			for(int i=0;i<log.size();i++) {
 				String robot_json = log.get(i);
 				try {
@@ -120,5 +121,6 @@ public class SimpleGameClient {
 		ans = itr.next().getDest();
 		return ans;
 	}
+	
 
 }
