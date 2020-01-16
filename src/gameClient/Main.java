@@ -18,8 +18,8 @@ public class Main {
 //		System.out.println(game.getRobots());
 //		s.game(6);
 //		s.game();
-		autoGame g=new autoGame(23);
-//		MyGameGUI s = new MyGameGUI();
+//		autoGame g=new autoGame(23);
+		MyGameGUI s = new MyGameGUI();
 //		System.out.println(s.getGraph().getEdge(9, 10));
 //		System.out.println(s.getGraph().getEdge(10, 9));
 //		System.out.println(s.getGraph().getEdge(4, 5));
