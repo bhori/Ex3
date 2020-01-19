@@ -3,6 +3,7 @@ package gameClient;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
+import java.util.List;
 
 import dataStructure.edge_data;
 import dataStructure.graph;
@@ -69,18 +70,23 @@ public class KML_Logger {
 	public void createPath(graph g) {
 		for(node_data n:g.getV()) {
 			addNode(n.getLocation().x(),n.getLocation().y(), n.getKey());
+			createLineString( n, g);
 		}
+	}
+	/**
+	 * The method received node_data and graph and build Placemark and LineString to this Placemark that including all edges between n and his neighbors in graph g. 
+	 * @param n
+	 * @param g
+	 */
+	private void createLineString(node_data n, graph g) {
 		Placemark p= doc.createAndAddPlacemark();
-		p.setName("Path");
-		p.createAndAddStyle().createAndSetLineStyle().withColor("ff0000ff").setWidth(2);; 
+		p.setName("Path"+n.getKey());
+		p.createAndAddStyle().createAndSetLineStyle().withColor("ff0000ff").setWidth(2);
 		LineString ls =p.createAndSetLineString();
 		ls.withTessellate(true);
-		for(node_data n:g.getV()) {
-			for(edge_data e: g.getE(n.getKey())) {
-				ls.addToCoordinates(n.getLocation().toString()+ ",0");
-				ls.addToCoordinates(g.getNode(e.getDest()).getLocation().toString()+ ",0");
-			}
+		for(edge_data e: g.getE(n.getKey())) {
 			ls.addToCoordinates(n.getLocation().toString()+ ",0");
+			ls.addToCoordinates(g.getNode(e.getDest()).getLocation().toString()+ ",0");
 		}
 	}
 	/**

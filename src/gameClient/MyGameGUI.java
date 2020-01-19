@@ -21,19 +21,26 @@ import dataStructure.node_data;
 import utils.Range;
 import utils.StdDraw;
 
-public class MyGameGUI implements ActionListener, MouseListener, Runnable {
-	private double pixel;
-	private boolean isManualGame = false;
+/**
+ * This class represents a game on gui window
+ * @author Itamar ziv-on, Ori ben-hamo
+ *
+ */
+public class MyGameGUI implements ActionListener, MouseListener {
+	private GameManager game_manager; 
 	private Range rx;
 	private Range ry;
-	private static Thread t;
-	private GameManager game_manager;
-	private String[] scenarioList = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "13", "14", "15","16", "17", "18", "19", "20", "21", "22", "23" };
-	private String[] gameOption = {"Manual","Automatic"};
 	private int scenario;
-	public static Color[] Colors = { Color.RED, Color.CYAN, Color.ORANGE, Color.PINK, Color.MAGENTA };
+	private double pixel; /*Describes a specific window scale according to the X coordinate range (we choosed pixel = rx.get_length() / 100), Used to draw certain information in the gui window with the same pixel deviation.*/
+	private boolean isManualGame = false; /*Induction Whether to allow game changes by mouse click, this is only possible for manual game.*/
+	private static Thread t; /*Responsible for updating the game as long as it is still running.*/
+	private String[] scenarioList = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15","16", "17", "18", "19", "20", "21", "22", "23" };/*scenario list, used for selecting scenario from that list.*/
+	private String[] gameOption = {"Manual","Automatic"}; /*options for the game, used for the window that opened after the user selected scenario.*/
+	public static Color[] Colors = { Color.RED, Color.CYAN, Color.ORANGE, Color.PINK, Color.MAGENTA }; /* Colors for the robots*/
+
 
 	public MyGameGUI() {
+		t= new Thread();
 		initStartGUI();
 	}
 
@@ -64,14 +71,20 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 		drawGraph();
 		StdDraw.show();
 	}
-
+	
+	/**
+	* Creates menu in the gui window with option to start the game.
+	*/
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Game");
 		menuBar.add(menu);
-		JMenuItem menuItem = new JMenuItem("Select scenario");
-		menuItem.addActionListener(this);
-		menu.add(menuItem);
+		JMenuItem menuItem1 = new JMenuItem("Select scenario");
+		JMenuItem menuItem2 = new JMenuItem("Save to KML");
+		menuItem1.addActionListener(this);
+		menuItem2.addActionListener(this);
+		menu.add(menuItem1);
+		menu.add(menuItem2);
 		return menuBar;
 	}
 
@@ -149,7 +162,8 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 
 	private void drawRobots() {
 		double x, y;
-		for (int a = 0; a < game_manager.getGame().getRobots().size(); a++) {
+		int numOfRobots = game_manager.getGame().getRobots().size();
+		for (int a = 0; a < numOfRobots; a++) {
 			int c = a % Colors.length;
 			StdDraw.setPenColor(Colors[c]);
 			x = game_manager.getRobots().get(a).getPos().x();
@@ -186,7 +200,9 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 		double x_location = StdDraw.userX(e.getX());
 		double y_location = StdDraw.userY(e.getY());
 		if (isManualGame) {
-			t = new Thread(this);
+//			t = new Thread(this);
+			GameThread gm = new GameThread(game_manager, this, isManualGame);
+			t= new Thread(gm);
 			game_manager.manualGame(x_location, y_location);
 		}
 	}
@@ -200,7 +216,11 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
+	public void mousePressed(MouseEvent e) {
+//		StdDraw.setCanvasSize(e.getX(), e.getY());
+//		int x_location =(int) StdDraw.userX(e.getX());
+//		int y_location =(int) StdDraw.userY(e.getY());
+//		StdDraw.setCanvasSize(x_location, y_location);
 	}
 
 	@Override
@@ -209,9 +229,14 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		String scenario = "";
 		String action = e.getActionCommand();
 		if (action.equals("Select scenario")) {
-			String scenario = (String) JOptionPane.showInputDialog(StdDraw.frame, "Please choose scenario number:",
+			if(t.isAlive()) {
+				JOptionPane.showMessageDialog(StdDraw.frame, "The game is running, please wait until it ends to run another game.");
+				return;
+			}
+			scenario = (String) JOptionPane.showInputDialog(StdDraw.frame, "Please choose scenario number:",
 					"scenario", JOptionPane.PLAIN_MESSAGE, null, scenarioList, scenarioList[0]);
 			try {
 				int scenario_num = Integer.parseInt(scenario);
@@ -223,6 +248,13 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 				JOptionPane.showMessageDialog(StdDraw.frame, "this scenario is wrong, should be a number between 0-23",
 						"Error", JOptionPane.ERROR_MESSAGE);
 //				return;
+			}
+		}
+		if (action.equals("Save to KML")) {
+			try {
+				game_manager.getKML().save(""+ this.scenario);
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
 			}
 		}
 	}
@@ -243,7 +275,9 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 						"", JOptionPane.INFORMATION_MESSAGE);
 			}
 		}else if(gameOp.equals("Automatic")) {
-			t= new Thread(this);
+//			t= new Thread(this);
+			GameThread gm = new GameThread(game_manager, this, isManualGame);
+			t= new Thread(gm);
 			game_manager.automaticGame(scenario_num);
 		}
 	}
@@ -285,43 +319,80 @@ public class MyGameGUI implements ActionListener, MouseListener, Runnable {
 	/**
 	 * 
 	 */
-	@Override
-	public void run() {
-		String results="";
-		if (isManualGame) {
-			while (game_manager.getGame().isRunning()) {
-				game_manager.getGame().move();
-				StdDraw.clear();
-				drawGame();
-				StdDraw.show();
-				try {
-					Thread.sleep(80);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			results = game_manager.getGame().toString();
-			isManualGame = false;
-		} else {
-			while (game_manager.getGame().isRunning()) {
-					game_manager.autoMoveRobots();
-					StdDraw.clear();
-					drawGame();
-				try {
-					Thread.sleep(80);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
-			}
-			results = game_manager.getGame().toString();
-			try {
-				game_manager.getKML().save(""+ scenario);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		System.out.println("Game Over: " + results);
-		JOptionPane.showMessageDialog(StdDraw.frame, "Game Over: " + results, "Game Over", JOptionPane.INFORMATION_MESSAGE);
-	}
+//<<<<<<< HEAD
+//	@Override
+//	public void run() {
+//		String results="";
+//		if (isManualGame) {
+//			while (game_manager.getGame().isRunning()) {
+//				game_manager.getGame().move();
+//				StdDraw.clear();
+//				drawGame();
+//				StdDraw.show();
+//				try {
+//					Thread.sleep(80);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			results = game_manager.getGame().toString();
+//			isManualGame = false;
+//		} else {
+//			while (game_manager.getGame().isRunning()) {
+//					game_manager.autoMoveRobots();
+//					StdDraw.clear();
+//					drawGame();
+//				try {
+//					Thread.sleep(80);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//
+//			}
+//			results = game_manager.getGame().toString();
+//			try {
+//				game_manager.getKML().save(""+ scenario);
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		System.out.println("Game Over: " + results);
+//		JOptionPane.showMessageDialog(StdDraw.frame, "Game Over: " + results, "Game Over", JOptionPane.INFORMATION_MESSAGE);
+//	}
+//=======
+//	@Override
+//	public void run() {
+//		String results="";
+//		if (isManualGame) {
+//			while (game_manager.getGame().isRunning()) {
+//				game_manager.getGame().move();
+//				StdDraw.clear();
+//				drawGame();
+////				StdDraw.show();
+//				try {
+//					Thread.sleep(80);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			results = game_manager.getGame().toString();
+//			isManualGame = false;
+//		} else {
+//			while (game_manager.getGame().isRunning()) {
+//					game_manager.autoMoveRobots();
+//					StdDraw.clear();
+//					drawGame();
+//				try {
+//					Thread.sleep(80);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//
+//			}
+//			results = game_manager.getGame().toString();
+//		}
+//		System.out.println("Game Over: " + results);
+//		JOptionPane.showMessageDialog(StdDraw.frame, "Game Over: " + results, "Game Over", JOptionPane.INFORMATION_MESSAGE);		
+//	}
+//>>>>>>> 0935e162c7dc9903e24fecee36de41b751467c92
 }
