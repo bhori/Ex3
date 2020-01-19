@@ -22,6 +22,7 @@ public class GameManager {
 	private List<Fruit> f;
 	private game_service game;
 	private int numOfRobots, robotsOnGraph = 0;
+//	private boolean showGui=false;
 	
 	public GameManager(int scenario_num) {
 		game = Game_Server.getServer(scenario_num);
@@ -43,8 +44,8 @@ public class GameManager {
 	
 	private void initRobots(JSONObject r) {
 		try {
-			int sumRobots = r.getInt("robots");
-			for (int i = 0; i < sumRobots; i++) {
+			numOfRobots = r.getInt("robots");
+			for (int i = 0; i < numOfRobots; i++) {
 				this.r.add(new Robot(i));
 			}
 		} catch (Exception e) {
@@ -58,8 +59,10 @@ public class GameManager {
 		}
 	}
 
+	/**
+	 * Placing the fruits on their edges.
+	 */
 	private void fruitsEdges() {
-//		ArrayListg.getV();
 		edge_data e;
 		Graph_Algo graph = new Graph_Algo(g);
 		for (Fruit fruit : f) {
@@ -74,6 +77,10 @@ public class GameManager {
 		}
 	}
 	
+	/**
+	 *  Placing the robots on vertices in the graph adjacent to the fruit with the highest value.
+	 *  Used only in automatic game!
+	 */
 	private void robotsPlace() {
 		int i = 0;
 		int node_id;
@@ -110,7 +117,6 @@ public class GameManager {
 	}
 	
 	public void updateRobots(List<String> r) {
-//		this.r=new ArrayList<Robot>();
 		Robot robot;
 		for (int i = 0; i < r.size(); i++) {
 			String robot_json = r.get(i);
@@ -163,7 +169,10 @@ public class GameManager {
 					game.addRobot(n.getKey());
 					updateRobots(game.getRobots());
 					if (robotsOnGraph == numOfRobots - 1) { /*At this point we placed the last robot on the graph so the game starts right away */
+//						GameThread gm = new GameThread(this);
+//						Thread t = new Thread(gm);
 						game.startGame();
+//						t.start();
 						MyGameGUI.getThread().start();
 					}
 					robotsOnGraph++;
@@ -171,7 +180,7 @@ public class GameManager {
 					for (int i = 0; i < robotsOnGraph; i++) {
 						if (r.get(i).getDest() == -1 && g.getEdge(r.get(i).getSrc(), n.getKey()) != null) {
 							game.chooseNextEdge(r.get(i).getId(), n.getKey());
-							/* This break is located here to avoid a situation where two robots reach the same vertex */
+							/* This break is located here to avoid a situation where two robots (or more) reach the same vertex */
 							break;
 						}
 					}
@@ -198,13 +207,21 @@ public class GameManager {
 		return null;
 	}
 	
+	public void automaticGame() {
+		robotsPlace();
+		GameThread gm = new GameThread(this);
+		Thread t = new Thread(gm);
+		game.startGame();
+		t.start();
+	}
+
 	public void automaticGame(int scenario_num) {
 		robotsPlace();
 		StdDraw.clear();
 		game.startGame();
 		MyGameGUI.getThread().start();
 	}
-
+	
 	public void autoMoveRobots() {
 		List<String> log = game.move();
 		System.out.println(log);

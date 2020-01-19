@@ -21,7 +21,6 @@ public class Robot {
    
    public void getInfoFromJson(JSONObject r) {
 	   try {
-//		setId(r.getInt("id"));
 		setSrc(r.getInt("src"));
 		setDest(r.getInt("dest"));
 		setValue(r.getDouble("value"));
@@ -32,11 +31,7 @@ public class Robot {
 		e.printStackTrace();
 	}
    }
-   
-//   public void setId(int id) {
-//	   this.id=id;
-//   }
-   
+     
    public void setSrc(int src) {
 	   this.src=src;
    }
