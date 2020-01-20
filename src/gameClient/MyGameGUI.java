@@ -201,6 +201,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 			GameThread gm = new GameThread(game_manager, this, isManualGame);
 			t= new Thread(gm);
 			game_manager.manualGame(x_location, y_location);
+//			game_manager.manualGame(x_location, y_location, gm);
 		}
 	}
 
@@ -237,6 +238,8 @@ public class MyGameGUI implements ActionListener, MouseListener {
 					"scenario", JOptionPane.PLAIN_MESSAGE, null, scenarioList, scenarioList[0]);
 			try {
 				int scenario_num = Integer.parseInt(scenario);
+//				game_manager = new GameManager();
+//				game_manager.clear();
 				game_manager = new GameManager(scenario_num);
 				initGUI();
 				selectGameOption(scenario_num); // return

@@ -22,25 +22,23 @@ public class GameThread implements Runnable {
 
 	@Override
 	public void run() {
-		game_service game = gm.getGame();
+//		game_service game = gm.getGame();
 		String results="";
 		if (isManualGame) {
-			while (game.isRunning()) {
-				game.move();
-//				if(gui!=null) {
+			while (gm.getGame().isRunning()) {
+				gm.getGame().move();
 				StdDraw.clear();
 				gui.drawGame();
-//				}
 				try {
 					Thread.sleep(80);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			results = game.toString();
+			results = gm.getGame().toString();
 			isManualGame = false;
 		} else {
-			while (game.isRunning()) {
+			while (gm.getGame().isRunning()) {
 					gm.autoMoveRobots();
 					if(gui!=null) {
 						StdDraw.clear();
@@ -53,7 +51,7 @@ public class GameThread implements Runnable {
 				}
 
 			}
-			results = game.toString();
+			results = gm.getGame().toString();
 		}
 		System.out.println("Game Over: " + results);
 		JOptionPane.showMessageDialog(StdDraw.frame, "Game Over: " + results, "Game Over", JOptionPane.INFORMATION_MESSAGE);		

@@ -16,13 +16,20 @@ import utils.Point3D;
 import utils.StdDraw;
 
 public class GameManager {
-	private MyGameGUI gui;
+//	private MyGameGUI gui;
 	private DGraph g;
 	private List<Robot> r;
 	private List<Fruit> f;
 	private game_service game;
 	private int numOfRobots, robotsOnGraph = 0;
 //	private boolean showGui=false;
+	
+//	public GameManager() {
+//		game = null;
+//		g = new DGraph();
+//		r=new ArrayList<Robot>();
+//		f = new ArrayList<Fruit>();
+//	}
 	
 	public GameManager(int scenario_num) {
 		game = Game_Server.getServer(scenario_num);
@@ -110,6 +117,14 @@ public class GameManager {
 		}
 	}
 	
+//	public void clear() {
+//		f.clear();
+//		r.clear();
+//		g=null;
+//		game=null;
+//		numOfRobots = robotsOnGraph = 0;
+//	}
+	
 	public void updateFruits(List<String> f) {
 		this.f.clear();
 		initFruits(f);
@@ -158,9 +173,9 @@ public class GameManager {
 		return r;
 	}
 
-	public MyGameGUI getGui() {
-		return gui;
-	}
+//	public MyGameGUI getGui() {
+//		return gui;
+//	}
 	
 	public void manualGame(double x, double y) {
 			node_data n = findNode(x, y);
@@ -170,7 +185,7 @@ public class GameManager {
 					updateRobots(game.getRobots());
 					if (robotsOnGraph == numOfRobots - 1) { /*At this point we placed the last robot on the graph so the game starts right away */
 //						GameThread gm = new GameThread(this);
-//						Thread t = new Thread(gm);
+//						Thread t = new Thread(gt);
 						game.startGame();
 //						t.start();
 						MyGameGUI.getThread().start();
@@ -218,8 +233,10 @@ public class GameManager {
 	public void automaticGame(int scenario_num) {
 		robotsPlace();
 		StdDraw.clear();
+//		Thread t = new Thread(gt);
 		game.startGame();
 		MyGameGUI.getThread().start();
+//		t.start();
 	}
 	
 	public void autoMoveRobots() {
