@@ -114,9 +114,21 @@ public class GameManager {
 				i++;
 			}
 			this.game.addRobot(node_id);
+			
 		}
 	}
-	
+	private void setIdForRobots(List<String> r) {
+		for (int i = 0; i < r.size(); i++) {
+			String robot_json = r.get(i);
+			try {
+				JSONObject line = new JSONObject(robot_json);
+				JSONObject ttt = line.getJSONObject("Robot");
+			    this.r.get(i).setId(ttt.getInt("id"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	public void updateFruits(List<String> f) {
 		this.f.clear();
 		initFruits(f);
@@ -184,6 +196,7 @@ public class GameManager {
 			if (n != null) {
 				if (robotsOnGraph < numOfRobots) { /*At this point we place the robots on the graph according to the mouse clicks */
 					game.addRobot(n.getKey());
+					this.setIdForRobots(game.getRobots());
 					updateRobots(game.getRobots());
 					if (robotsOnGraph == numOfRobots - 1) { /*At this point we placed the last robot on the graph so the game starts right away */
 //						GameThread gm = new GameThread(this);
@@ -241,6 +254,8 @@ public class GameManager {
 
 	public void automaticGame(int scenario_num) {
 		robotsPlace();
+		this.setIdForRobots(game.getRobots());
+		System.out.println(game.getRobots());
 		StdDraw.clear();
 		game.startGame();
 		MyGameGUI.getThread().start();

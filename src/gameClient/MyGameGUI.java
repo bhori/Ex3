@@ -276,6 +276,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 			}
 		}else if(gameOp.equals("Automatic")) {
 //			t= new Thread(this);
+			isManualGame = false;
 			GameThread gm = new GameThread(game_manager, this, isManualGame);
 			t= new Thread(gm);
 			game_manager.automaticGame(scenario_num);
