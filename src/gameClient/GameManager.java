@@ -340,10 +340,8 @@ public class GameManager {
 		this.setIdForRobots(game.getRobots());
 		System.out.println(game.getRobots());
 		StdDraw.clear();
-//		Thread t = new Thread(gt);
 		game.startGame();
 		MyGameGUI.getThread().start();
-//		t.start();
 	}
 
 	/**
