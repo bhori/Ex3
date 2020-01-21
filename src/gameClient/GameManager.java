@@ -1,5 +1,6 @@
 package gameClient;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,26 +16,48 @@ import dataStructure.node_data;
 import utils.Point3D;
 import utils.StdDraw;
 
+/**
+ * This class represents a game management system, In this game there is a server that enables to load a scenario between 0 and 23,
+ * In each scenario there is a graph, fruits and robots, each fruit has a value and position on the graph edges and each robot has a position on the graph.
+ * The goal of the game is to get as many points as possible by eating fruits by the robots.
+ * 
+ * There are two types of fruit:
+ * Apple - is located on a edge in the direction from low vertex to a high vertex.
+ * Banana - is located on a edge in the direction from high vertex to low vertex.
+ * 
+ * This class enables to load a scenario from 0 to 23 and select one of the following options: Manual or Automatic play.
+ * 
+ * Manual game - In this option the whole game is managed by the user, the user selects the position of the robots on the graph
+ * and moves them from one vertex to another by mouse clicks.
+ * 
+ * Automatic game - With this option the game is managed automatically and efficiently,
+ * the robots are initially positioned near the fruits with the highest value and then moving on each time towards the fruit closest to them.
+ * 
+ * This class enables to save the game that ended in a KML file. 
+ * 
+ * @author ItamarZiv-On, OriBH.
+ *
+ */
 public class GameManager {
-//	private MyGameGUI gui;
 	private DGraph g;
 	private List<Robot> r;
 	private List<Fruit> f;
 	private game_service game;
 	private int numOfRobots, robotsOnGraph = 0;
-//	private boolean showGui=false;
-	
-//	public GameManager() {
-//		game = null;
-//		g = new DGraph();
-//		r=new ArrayList<Robot>();
-//		f = new ArrayList<Fruit>();
-//	}
-	
-	public GameManager(int scenario_num) {
+	private KML_Logger k;
+	private int timeForKML=0;
+
+	/**
+	 * Initializes a game according to the selected scenario.
+	 * @param scenario_num - The scenario number.
+	 * @throws FileNotFoundException
+	 */
+	public GameManager(int scenario_num) throws FileNotFoundException {
 		game = Game_Server.getServer(scenario_num);
 		g = new DGraph();
 		g.init(game.getGraph());
+		k=new KML_Logger();
+		k.createPath(g);
 		r = new ArrayList<Robot>();
 		f = new ArrayList<Fruit>();
 		try {
@@ -49,6 +72,10 @@ public class GameManager {
 		fruitsEdges();
 	}
 	
+	/**
+	 * Initializes the list of robots from the server.
+	 * @param r - A JSON object with the information about the robots.
+	 */
 	private void initRobots(JSONObject r) {
 		try {
 			numOfRobots = r.getInt("robots");
@@ -60,6 +87,10 @@ public class GameManager {
 		}
 	}
 	
+	/**
+	 * Initializes the list of fruits from the server.
+	 * @param f - List of String with the data about the fruits.
+	 */
 	private void initFruits(List<String> f) {
 		for (int i = 0; i < f.size(); i++) {
 			this.f.add(new Fruit(f.get(i)));
@@ -114,23 +145,38 @@ public class GameManager {
 				i++;
 			}
 			this.game.addRobot(node_id);
+			
 		}
 	}
 	
-//	public void clear() {
-//		f.clear();
-//		r.clear();
-//		g=null;
-//		game=null;
-//		numOfRobots = robotsOnGraph = 0;
-//	}
 	
+	private void setIdForRobots(List<String> r) {
+		for (int i = 0; i < r.size(); i++) {
+			String robot_json = r.get(i);
+			try {
+				JSONObject line = new JSONObject(robot_json);
+				JSONObject ttt = line.getJSONObject("Robot");
+			    this.r.get(i).setId(ttt.getInt("id"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Updates the fruit list and placing the new fruits in the graph on their edges.
+	 * @param f - List of String with the data about the fruits.
+	 */
 	public void updateFruits(List<String> f) {
 		this.f.clear();
 		initFruits(f);
 		fruitsEdges();
 	}
-	
+
+	/**
+	 * Updates the robots list.
+	 * @param r - List of String with the data about the robots.
+	 */
 	public void updateRobots(List<String> r) {
 		Robot robot;
 		for (int i = 0; i < r.size(); i++) {
@@ -138,7 +184,7 @@ public class GameManager {
 			try {
 				JSONObject line = new JSONObject(robot_json);
 				JSONObject ttt = line.getJSONObject("Robot");
-				robot = new Robot(ttt.getInt("id"));
+//				robot = new Robot(ttt.getInt("id"));
 				robot = this.getRobot(ttt.getInt("id"));
 				robot.getInfoFromJson(ttt);
 				robot.setDest(-1);
@@ -149,6 +195,11 @@ public class GameManager {
 		}
 	}
 	
+	/**
+	 * Returns the robot with the selected id, null if none.
+	 * @param id - id of the robot.
+	 * @return
+	 */
 	public Robot getRobot(int id) {
 		for (int i = 0; i < r.size(); i++) {
 			if (r.get(i).getId() == id)
@@ -157,41 +208,75 @@ public class GameManager {
 		return null;
 	}
 	
+	/**
+	 * Returns the graph of this game.
+	 * @return
+	 */
 	public DGraph getGraph() {
 		return g;
 	}
 	
+	/**
+	 * Returns the list of the fruits in the game. 
+	 * @return
+	 */
 	public List<Fruit> getFruits() {
 		return f;
 	}
 
+	/**
+	 * Returns the game service.
+	 * @return
+	 */
 	public game_service getGame() {
 		return game;
 	}
 	
+	/**
+	 * Returns the list of the robots in the game. 
+	 * @return
+	 */
 	public List<Robot> getRobots() {
 		return r;
 	}
-
-//	public MyGameGUI getGui() {
-//		return gui;
-//	}
 	
+	public KML_Logger getKML() {
+		return k;
+	}
+	
+	public int getTimeForKML() {
+		return timeForKML;
+	}
+	
+	public void setTimeForKML(int time) {
+		timeForKML=time;
+	}
+	
+	/**
+	 * Manual game management system - places the robots on the graph and moves them during the game according to the mouse clicks.
+	 * @param x - The x coordinate in the graph according to the mouse click.
+	 * @param y - The y coordinate in the graph according to the mouse click.
+	 */
 	public void manualGame(double x, double y) {
 			node_data n = findNode(x, y);
 			if (n != null) {
 				if (robotsOnGraph < numOfRobots) { /*At this point we place the robots on the graph according to the mouse clicks */
 					game.addRobot(n.getKey());
+					this.setIdForRobots(game.getRobots());
 					updateRobots(game.getRobots());
 					if (robotsOnGraph == numOfRobots - 1) { /*At this point we placed the last robot on the graph so the game starts right away */
-//						GameThread gm = new GameThread(this);
-//						Thread t = new Thread(gt);
+						updateFruits(game.getFruits());
+						for (Fruit fruit : f)
+							k.addFruitPlace(fruit.getPos().x(), fruit.getPos().y(), fruit.getType());
+						for (Robot robot : r)
+						    k.addRobotPlace(robot.getPos().x(), robot.getPos().y(), robot.getId());
 						game.startGame();
-//						t.start();
 						MyGameGUI.getThread().start();
 					}
 					robotsOnGraph++;
 				} else { /* At this point all the robots are placed on the graph and we move them according to the mouse clicks */
+					updateRobots(game.getRobots());
+					updateFruits(game.getFruits());
 					for (int i = 0; i < robotsOnGraph; i++) {
 						if (r.get(i).getDest() == -1 && g.getEdge(r.get(i).getSrc(), n.getKey()) != null) {
 							game.chooseNextEdge(r.get(i).getId(), n.getKey());
@@ -215,13 +300,17 @@ public class GameManager {
 	private node_data findNode(double x, double y) {
 		Point3D p = new Point3D(x, y);
 		for (node_data n : g.getV()) {
-			if (p.distance2D(n.getLocation()) <= 0.0003) {// 0.0003
+			if (p.distance2D(n.getLocation()) <= 0.0003) {
 				return n;
 			}
 		}
 		return null;
 	}
 	
+	/**
+	 * Automatic game management system without displaying in a gui window - places the 
+	 * robots on the graph and moves them automatically during the game.
+	 */
 	public void automaticGame() {
 		robotsPlace();
 		GameThread gm = new GameThread(this);
@@ -230,8 +319,14 @@ public class GameManager {
 		t.start();
 	}
 
+	/**
+	 * Automatic game management system with gui window display - places the 
+	 * robots on the graph and moves them automatically during the game.
+	 */
 	public void automaticGame(int scenario_num) {
 		robotsPlace();
+		this.setIdForRobots(game.getRobots());
+		System.out.println(game.getRobots());
 		StdDraw.clear();
 //		Thread t = new Thread(gt);
 		game.startGame();
@@ -250,9 +345,16 @@ public class GameManager {
 			double timeToGet;
 			sortFruits();
 			long tEnd = game.timeToEnd();
+			int tSec=(int)(tEnd / 500);
 			System.out.println(tEnd / 1000);
 			System.out.println(f);
-
+			if(timeForKML!=tSec) {
+				for (Fruit fruit : f)
+					k.addFruitPlace(fruit.getPos().x(), fruit.getPos().y(), fruit.getType());
+				for (Robot robot : r)
+				    k.addRobotPlace(robot.getPos().x(), robot.getPos().y(), robot.getId());
+				timeForKML=tSec;
+			}
 			// find the short time between the robots to the fruit(the fruits organize in
 			// order to the value of the fruits, the biggest value first)
 			for (Fruit fruit : f) {

@@ -8,6 +8,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/java-json.jar"/>
 	<classpathentry kind="lib" path="lib/GameServer_v0.27.jar"/>
+	<classpathentry kind="lib" path="lib/javaapiforkml-2.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-core-2.3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-impl-2.3.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

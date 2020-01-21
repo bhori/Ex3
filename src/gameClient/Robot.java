@@ -31,6 +31,10 @@ public class Robot {
 		e.printStackTrace();
 	}
    }
+   
+   public void setId(int id) {
+	   this.id=id;
+   }
      
    public void setSrc(int src) {
 	   this.src=src;
