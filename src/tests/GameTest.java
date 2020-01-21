@@ -2,6 +2,7 @@ package tests;
 
 import java.io.FileNotFoundException;
 
+import gameClient.GameManager;
 import gameClient.MyGameGUI;
 
 public class GameTest {
