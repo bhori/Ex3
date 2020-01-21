@@ -13,3 +13,9 @@ Manual game - In this option the whole game is managed by the user, the user sel
 Automatic game - In this option the game is managed automatically and efficiently, the robots are initially positioned near the fruits with the highest value and then moving on each time towards the fruit closest to them.
 
 In addition, This repository enables to save the game that ended in a KML file.
+
+Example of a game in a graphic window:
+![](images/GameExample.png)
+
+Example of a game display in KML:
+![](images/KMLExample.png)
