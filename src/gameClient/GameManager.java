@@ -63,7 +63,6 @@ public class GameManager {
 		try {
 			JSONObject line = new JSONObject(game.toString());
 			JSONObject info = line.getJSONObject("GameServer");
-//			numOfRobots = info.getInt("robots");
 			initRobots(info);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -406,16 +405,6 @@ public class GameManager {
 					}
 				}
 			}
-//			//if have robots that came to src of some fruit, eat the fruit.
-//			 for(Robot robot:r) {
-//				 if(robot.getDest()==robot.getSrc()) {
-//				  for(Fruit fruit:f) {
-//					if(fruit.getSrc()!=-1 && robot.getDest()==fruit.getSrc()) {
-//						game.chooseNextEdge(robot.getId(),fruit.getDest());
-//						fruit.setSrc(-1);
-//					}
-//				  }
-//				 }
 
 		}
 	}
