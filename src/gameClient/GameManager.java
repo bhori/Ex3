@@ -19,10 +19,10 @@ import utils.StdDraw;
 /**
  * This class represents a game management system, In this game there is a server that enables to load a scenario between 0 and 23,
  * In each scenario there is a graph, fruits and robots, each fruit has a value and position on the graph edges and each robot has a position on the graph.
- * The goal of the game is to get as many points as possible by eating fruits by the robots.
+ * The goal of the game is to get as many points as possible by eating fruits by the robots until the game ends.
  * 
  * There are two types of fruit:
- * Apple - is located on a edge in the direction from low vertex to a high vertex.
+ * Apple - is located on a edge in the direction from low vertex to high vertex.
  * Banana - is located on a edge in the direction from high vertex to low vertex.
  * 
  * This class enables to load a scenario from 0 to 23 and select one of the following options: Manual or Automatic play.
@@ -30,7 +30,7 @@ import utils.StdDraw;
  * Manual game - In this option the whole game is managed by the user, the user selects the position of the robots on the graph
  * and moves them from one vertex to another by mouse clicks.
  * 
- * Automatic game - With this option the game is managed automatically and efficiently,
+ * Automatic game - In this option the game is managed automatically and efficiently,
  * the robots are initially positioned near the fruits with the highest value and then moving on each time towards the fruit closest to them.
  * 
  * This class enables to save the game that ended in a KML file. 
@@ -125,11 +125,7 @@ public class GameManager {
 		int node_id;
 		Point3D p;
 		node_data n;
-		Fruit_Comperator c = new Fruit_Comperator();
-		f.sort(c);
-		for (Fruit j : f) {
-			System.out.println(j.getValue() + ", " + j.getSrc() + ", " + j.getPos());
-		}
+		sortFruits();
 		for (Robot robot : r) {
 			if (i < f.size()) {
 				node_id = f.get(i).getSrc();
@@ -369,7 +365,7 @@ public class GameManager {
 			sortFruits();
 			long tEnd = game.timeToEnd();
 			int tSec=(int)(tEnd / 500);
-			System.out.println(tEnd / 1000);
+			System.out.println("Time to end: "+tEnd / 1000);
 			System.out.println(f);
 			if(timeForKML!=tSec) {//this for the kml that draw the game something like every half second. 
 				for (Fruit fruit : f)

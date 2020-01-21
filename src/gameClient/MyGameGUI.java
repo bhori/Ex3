@@ -25,10 +25,10 @@ import utils.StdDraw;
  * This class represents a graphical interface that enables to play and view a game in a gui window.
  * In this game there is a server that enables to load a scenario between 0 and 23,
  * In each scenario there is a graph, fruits and robots, each fruit has a value and position on the graph edges and each robot has a position on the graph.
- * The goal of the game is to get as many points as possible by eating fruits by the robots.
+ * The goal of the game is to get as many points as possible by eating fruits by the robots until the game ends.
  * 
  * There are two types of fruit:
- * Apple - is located on a edge in the direction from low vertex to a high vertex.
+ * Apple - is located on a edge in the direction from low vertex to high vertex.
  * Banana - is located on a edge in the direction from high vertex to low vertex.
  * 
  * This class enables to load a scenario from 0 to 23 from the gui window and select one of the following options: Manual or Automatic play.
@@ -57,6 +57,8 @@ import utils.StdDraw;
  * and for a fruit that is on edge from high vertex to low vertex, a picture of an banana appears.
  * The robots are shown using large points that are painted in different colors (the options are - red, cyan, orange, pink, magenta).
  * 
+ * This class uses the StdDraw library and Range and Point3D classes.
+ * 
  * @author ItamarZiv-On, OriBH.
  *
  */
@@ -77,6 +79,9 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	//Colors for the robots.
 	public static Color[] Colors = { Color.RED, Color.CYAN, Color.ORANGE, Color.PINK, Color.MAGENTA };
 
+	/**
+	 * Initializes a blank graphic window and opens it.
+	 */
 	public MyGameGUI() {
 		t = new Thread();
 		initStartGUI();
@@ -105,7 +110,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		StdDraw.clear();
 		StdDraw.setXscale(rx.get_min() - rX, rx.get_max() + rX);
 		StdDraw.setYscale(ry.get_min() - rY, ry.get_max() + rY);
-		StdDraw.text((rx.get_max()+rx.get_min())/2, ry.get_max()-2*pixel, "scenario: "+this.scenario);
+		StdDraw.text(rx.get_max(), ry.get_max(), "scenario: "+this.scenario);
 		drawFruits();
 		drawGraph();
 		StdDraw.show();
@@ -119,11 +124,8 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		JMenu menu = new JMenu("Game");
 		menuBar.add(menu);
 		JMenuItem menuItem1 = new JMenuItem("Select scenario");
-//		JMenuItem menuItem2 = new JMenuItem("Save to KML");
 		menuItem1.addActionListener(this);
-//		menuItem2.addActionListener(this);
 		menu.add(menuItem1);
-//		menu.add(menuItem2);
 		return menuBar;
 	}
 
@@ -200,6 +202,9 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Draws the robots on the graph.
+	 */
 	private void drawRobots() {
 		double x, y;
 		int numOfRobots = game_manager.getGame().getRobots().size();
@@ -213,6 +218,9 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Draws the fruits on the graph.
+	 */
 	private void drawFruits() {
 		double x, y;
 		for (Fruit fruit : game_manager.getFruits()) {
@@ -226,6 +234,10 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * Returns the thread of this class.
+	 * @return the thread of this class
+	 */
 	public static Thread getThread() {
 		return t;
 	}
@@ -243,25 +255,28 @@ public class MyGameGUI implements ActionListener, MouseListener {
 			GameThread gm = new GameThread(game_manager, this, this.scenario, isManualGame);
 			t = new Thread(gm);
 			game_manager.manualGame(x_location, y_location);
+			if(!(game_manager.getGame().isRunning())) {
+				StdDraw.clear();
+				drawGame();
+			}
 		}
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-	}
+	public void mouseEntered(MouseEvent arg0) {}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-	}
+	public void mouseExited(MouseEvent arg0) {}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-	}
+	public void mousePressed(MouseEvent e) {}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-	}
+	public void mouseReleased(MouseEvent arg0) {}
 
+	/**
+	 * Initializes the game with the selected scenario and display it on the gui window.
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String scenario = "";
@@ -281,11 +296,14 @@ public class MyGameGUI implements ActionListener, MouseListener {
 				initGUI();
 				selectGameOption(scenario_num);
 			} catch (Exception e2) {
-//				System.out.println(e2.getMessage());
 			}
 		}
 	}
 
+	/**
+	 * enables to select how to play the game - Manual or Automatic.
+	 * @param scenario_num - The scenario number
+	 */
 	private void selectGameOption(int scenario_num) {
 		int index = JOptionPane.showOptionDialog(StdDraw.frame, "Please choose game option:", "Game Option",
 				JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE, null, gameOption, gameOption[0]);
@@ -315,12 +333,14 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	 * game.
 	 */
 	public void drawGame() {
+		StdDraw.text(rx.get_max(), ry.get_max(), "scenario: "+this.scenario);
 		game_manager.updateFruits(game_manager.getGame().getFruits());
 		game_manager.updateRobots(game_manager.getGame().getRobots());
 		drawFruits();
 		drawGraph();
 		drawRobots();
-		drawInfo();
+		if(game_manager.getGame().isRunning())
+			drawInfo();
 		StdDraw.show();
 	}
 
@@ -330,10 +350,9 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	public void drawInfo() {
 		int result = 0;
 		int timeToEnd = (int) game_manager.getGame().timeToEnd() / 1000;
-		System.out.println(game_manager.getGame().timeToEnd());
 		double rX = rx.get_length() / 20;
 		double rY = ry.get_length() / 15;
-		StdDraw.text((rx.get_max()+rx.get_min())/2, ry.get_max()-2*pixel, "scenario: "+this.scenario);
+		StdDraw.setPenColor(Color.BLACK);
 		try {
 			JSONObject gameServer = new JSONObject(game_manager.getGame().toString()).getJSONObject("GameServer");
 			result = gameServer.getInt("grade");
