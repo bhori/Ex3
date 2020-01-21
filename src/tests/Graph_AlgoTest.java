@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import algorithms.Graph_Algo;
 import dataStructure.DGraph;
 import dataStructure.Node;
+import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
 import gui.Graph_Gui;
@@ -121,6 +122,16 @@ class Graph_AlgoTest {
 		assertTrue(gr.get(1).isConnected());
 		assertTrue(gr.get(2).isConnected());
 		assertFalse(gr.get(3).isConnected());
+	}
+	@Test	
+	void findEdgeToPointTest() {
+		Point3D p= new Point3D(8,9);
+		edge_data e=gr.get(3).findEdgeToPoint(p);
+		assertEquals(e.getSrc(),6);
+		assertEquals(e.getDest(),7);
+		Point3D p1= new Point3D(82,-9);
+		e=gr.get(3).findEdgeToPoint(p1);
+		assertEquals(e,null);
 	}
 	public static ArrayList<Graph_Algo> initialTest() {
 		ArrayList<Graph_Algo> gr= new ArrayList<Graph_Algo>();

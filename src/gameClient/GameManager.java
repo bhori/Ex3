@@ -27,7 +27,11 @@ public class GameManager {
 	private int timeForKML=0;
 //	private boolean showGui=false;
 
-	
+	/**
+	 * 
+	 * @param scenario_num
+	 * @throws FileNotFoundException
+	 */
 	public GameManager(int scenario_num) throws FileNotFoundException {
 		game = Game_Server.getServer(scenario_num);
 //		System.out.println(game.toString());
@@ -40,7 +44,7 @@ public class GameManager {
 		try {
 			JSONObject line = new JSONObject(game.toString());
 			JSONObject info = line.getJSONObject("GameServer");
-			numOfRobots = info.getInt("robots");
+//			numOfRobots = info.getInt("robots");
 			initRobots(info);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,7 +52,11 @@ public class GameManager {
 		initFruits(game.getFruits());
 		fruitsEdges();
 	}
-	
+	/**
+	 * The method received a JSONObject and build and add Robots to the list<Robot> r of the class according to this object 
+	 * that contain information about number of robots in this game. .
+	 * @param r
+	 */
 	private void initRobots(JSONObject r) {
 		try {
 			numOfRobots = r.getInt("robots");
@@ -59,7 +67,10 @@ public class GameManager {
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * The method received a list of Json String and build and add Fruits to the list<Fruit> r of the class according to this list.
+	 * @param f
+	 */
 	private void initFruits(List<String> f) {
 		for (int i = 0; i < f.size(); i++) {
 			this.f.add(new Fruit(f.get(i)));
@@ -117,6 +128,11 @@ public class GameManager {
 			
 		}
 	}
+	/**
+	 * The method received list of Json strings that contain information about the robots in this game from the server, 
+	 * and according to the list set the id of the robots of this class. 
+	 * @param r
+	 */
 	private void setIdForRobots(List<String> r) {
 		for (int i = 0; i < r.size(); i++) {
 			String robot_json = r.get(i);
@@ -129,12 +145,20 @@ public class GameManager {
 			}
 		}
 	}
+	/**
+	 * The method received a list of Json String and update the fruits  of the class according to this list.
+	 * For each update the fruits rebuilding. 
+	 * @param f
+	 */
 	public void updateFruits(List<String> f) {
 		this.f.clear();
 		initFruits(f);
 		fruitsEdges();
 	}
-	
+	/**
+	 * The method received a list of Json String and update the robots of the class according to this list.
+	 * @param r
+	 */
 	public void updateRobots(List<String> r) {
 		Robot robot;
 		for (int i = 0; i < r.size(); i++) {
@@ -152,7 +176,11 @@ public class GameManager {
 			}
 		}
 	}
-	
+	/**
+	 * The method received id and return the robot with this id if exist, if not exist return null.
+	 * @param id
+	 * @return
+	 */
 	public Robot getRobot(int id) {
 		for (int i = 0; i < r.size(); i++) {
 			if (r.get(i).getId() == id)
@@ -160,37 +188,67 @@ public class GameManager {
 		}
 		return null;
 	}
-	
+	/**
+	 * The method return the graph of the class.
+	 * @return
+	 */
 	public DGraph getGraph() {
 		return g;
 	}
-	
+	/**
+	 * The method return the list<Fruit> of the class.
+	 * @return
+	 */
 	public List<Fruit> getFruits() {
 		return f;
 	}
-
+	/**
+	 * The method return the game_service of the class.
+	 * @return
+	 */
 	public game_service getGame() {
 		return game;
 	}
-	
+	/**
+	 * The method return the list<Robot> of the class.
+	 * @return
+	 */
 	public List<Robot> getRobots() {
 		return r;
 	}
-
+	/**
+	 * The method return the MyGameGUI of the class.
+	 * @return
+	 */
 	public MyGameGUI getGui() {
 		return gui;
 	}
-	
+	/**
+	 * The method return the KML_Logger of the class.
+	 * @return
+	 */
 	public KML_Logger getKML() {
 		return k;
 	}
+	/**
+	 * The method return TimeForKML.
+	 * @return
+	 */
 	public int getTimeForKML() {
 		return timeForKML;
 	}
+	/**
+	 * The method received time and change the timeForKML to this time.
+	 * @param time
+	 */
 	public void setTimeForKML(int time) {
 		timeForKML=time;
 	}
-	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 */
 	public void manualGame(double x, double y) {
 			node_data n = findNode(x, y);
 			if (n != null) {
@@ -243,7 +301,9 @@ public class GameManager {
 		}
 		return null;
 	}
-	
+	/**
+	 * 
+	 */
 	public void automaticGame() {
 		robotsPlace();
 		GameThread gm = new GameThread(this);
@@ -251,7 +311,10 @@ public class GameManager {
 		game.startGame();
 		t.start();
 	}
-
+	/**
+	 * 
+	 * @param scenario_num
+	 */
 	public void automaticGame(int scenario_num) {
 		robotsPlace();
 		this.setIdForRobots(game.getRobots());
@@ -260,7 +323,12 @@ public class GameManager {
 		game.startGame();
 		MyGameGUI.getThread().start();
 	}
-	
+	/**
+	 * The method first of all doing the next move in the game, than update the fruits and robots of the class 
+	 * and prepare the next step of each robot.The method sort the fruit in the list by they value the biggest first
+	 * check who the robot that can eat the fruit first, and this robot go to the fruit, 
+	 * and the same check for the fruits that left with the robots that left. 
+	 */
 	public void autoMoveRobots() {
 		List<String> log = game.move();
 		System.out.println(log);
@@ -275,7 +343,7 @@ public class GameManager {
 			int tSec=(int)(tEnd / 500);
 			System.out.println(tEnd / 1000);
 			System.out.println(f);
-			if(timeForKML!=tSec) {
+			if(timeForKML!=tSec) {//this for the kml that draw the game something like every half second. 
 				for (Fruit fruit : f)
 					k.addFruitPlace(fruit.getPos().x(), fruit.getPos().y(), fruit.getType());
 				for (Robot robot : r)
@@ -347,7 +415,7 @@ public class GameManager {
 	 * Simple swap method, received two indexes and swap between the fruits that in
 	 * this indexes in the list.
 	 * 
-	 * @param   f-list of fruits
+	 * @param f-list of fruits
 	 * @param i
 	 * @param j
 	 */
