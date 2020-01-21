@@ -22,25 +22,63 @@ import utils.Range;
 import utils.StdDraw;
 
 /**
- * This class represents a game on gui window
- * @author Itamar ziv-on, Ori ben-hamo
+ * This class represents a graphical interface that enables to play and view a game in a gui window.
+ * In this game there is a server that enables to load a scenario between 0 and 23,
+ * In each scenario there is a graph, fruits and robots, each fruit has a value and position on the graph edges and each robot has a position on the graph.
+ * The goal of the game is to get as many points as possible by eating fruits by the robots.
+ * 
+ * There are two types of fruit:
+ * Apple - is located on a edge in the direction from low vertex to a high vertex.
+ * Banana - is located on a edge in the direction from high vertex to low vertex.
+ * 
+ * This class enables to load a scenario from 0 to 23 from the gui window and select one of the following options: Manual or Automatic play.
+ * 
+ * Manual game - In this option the whole game is managed by the user, the user selects the position of the robots on the graph
+ * and moves them from one vertex to another by mouse clicks.
+ * 
+ * Automatic game - With this option the game is managed automatically and efficiently,
+ * the robots are initially positioned near the fruits with the highest value and then moving on each time towards the fruit closest to them.
+ * 
+ * As long as the game is running you can see in the gui window the time left for the game's score and the result achieved so far,
+ * after the game ends, a window opens showing the final result.
+ * 
+ * This class enables to save the game that ended in a KML file, After the game ends,
+ * a window opens asking if you want to save the game as a KML file, This option is only possible after the game is over.
+ * 
+ * How to use - After creating an object from the class you need to run the program and then a blank gui window opens,
+ * to load a game you have to click "Game" on the menu and then "Select scenario", select a scenario from the list and a game option (automatic / manual) and start playing.
+ * Just note that when there is a running game there is no way to load a new game until it finishes.
+ * 
+ * Game objects display -
+ * The vertices of the graph are blue, above each vertex appears its serial number.
+ * The edges of the graph are black, each edge has a yellow point near the destination vertex that indicates the direction of the edge.
+ * Next to the yellow point is the weight of the edge (the time in seconds it will take the robot to walk the edge at normal speed).
+ * For a fruit that is on edge from low vertex to high vertex, a picture of an apple appears,
+ * and for a fruit that is on edge from high vertex to low vertex, a picture of an banana appears.
+ * The robots are shown using large points that are painted in different colors (the options are - red, cyan, orange, pink, magenta).
+ * 
+ * @author ItamarZiv-On, OriBH.
  *
  */
 public class MyGameGUI implements ActionListener, MouseListener {
-	private GameManager game_manager; 
-	private Range rx;
-	private Range ry;
+	private GameManager game_manager;
+	private Range rx, ry;
 	private int scenario;
-	private double pixel; /*Describes a specific window scale according to the X coordinate range (we choosed pixel = rx.get_length() / 100), Used to draw certain information in the gui window with the same pixel deviation.*/
-	private boolean isManualGame = false; /*Induction Whether to allow game changes by mouse click, this is only possible for manual game.*/
-	private static Thread t; /*Responsible for updating the game as long as it is still running.*/
-	private String[] scenarioList = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15","16", "17", "18", "19", "20", "21", "22", "23" };/*scenario list, used for selecting scenario from that list.*/
-	private String[] gameOption = {"Manual","Automatic"}; /*options for the game, used for the window that opened after the user selected scenario.*/
-	public static Color[] Colors = { Color.RED, Color.CYAN, Color.ORANGE, Color.PINK, Color.MAGENTA }; /* Colors for the robots*/
-
+	//Describes a specific window scale according to the X coordinate range (we choosed pixel = rx.get_length() / 100), Used to draw certain information in the gui window with the same pixel deviation.
+	private double pixel; 
+	//Induction Whether to allow game changes by mouse click, this is only possible for manual game.
+	private boolean isManualGame = false; 
+	//Responsible for updating the game as long as it is still running.
+	private static Thread t; 
+	//scenario list, used for selecting scenario from that list.
+	private String[] scenarioList = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14","15", "16", "17", "18", "19", "20", "21", "22","23" };
+	//options for the game, used for the window that opened after the user selected scenario.
+	private String[] gameOption = { "Manual", "Automatic" }; 
+	//Colors for the robots.
+	public static Color[] Colors = { Color.RED, Color.CYAN, Color.ORANGE, Color.PINK, Color.MAGENTA };
 
 	public MyGameGUI() {
-		t= new Thread();
+		t = new Thread();
 		initStartGUI();
 	}
 
@@ -67,24 +105,25 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		StdDraw.clear();
 		StdDraw.setXscale(rx.get_min() - rX, rx.get_max() + rX);
 		StdDraw.setYscale(ry.get_min() - rY, ry.get_max() + rY);
+		StdDraw.text((rx.get_max()+rx.get_min())/2, ry.get_max()-2*pixel, "scenario: "+this.scenario);
 		drawFruits();
 		drawGraph();
 		StdDraw.show();
 	}
-	
+
 	/**
-	* Creates menu in the gui window with option to start the game.
-	*/
+	 * Creates menu in the gui window with option to start the game.
+	 */
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Game");
 		menuBar.add(menu);
 		JMenuItem menuItem1 = new JMenuItem("Select scenario");
-		JMenuItem menuItem2 = new JMenuItem("Save to KML");
+//		JMenuItem menuItem2 = new JMenuItem("Save to KML");
 		menuItem1.addActionListener(this);
-		menuItem2.addActionListener(this);
+//		menuItem2.addActionListener(this);
 		menu.add(menuItem1);
-		menu.add(menuItem2);
+//		menu.add(menuItem2);
 		return menuBar;
 	}
 
@@ -128,8 +167,9 @@ public class MyGameGUI implements ActionListener, MouseListener {
 
 	/**
 	 * draws the graph: vertices are painted in blue, edges are painted in black, on
-	 * every edge have a yellow point near to the destination node that show the direction
-	 * of the edge, the weight of the edge represented near to the destination node too.
+	 * every edge have a yellow point near to the destination node that show the
+	 * direction of the edge, the weight of the edge represented near to the
+	 * destination node too.
 	 */
 	private void drawGraph() {
 		double x0, x1, y0, y1, xDirection, yDirection;
@@ -173,7 +213,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		}
 	}
 
-	private void drawFruits() { // in scenario 17 there is apple on banana and we cannot see the banana!
+	private void drawFruits() {
 		double x, y;
 		for (Fruit fruit : game_manager.getFruits()) {
 			x = fruit.getPos().x();
@@ -185,7 +225,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 			}
 		}
 	}
-	
+
 	public static Thread getThread() {
 		return t;
 	}
@@ -200,9 +240,8 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		double x_location = StdDraw.userX(e.getX());
 		double y_location = StdDraw.userY(e.getY());
 		if (isManualGame) {
-//			t = new Thread(this);
-			GameThread gm = new GameThread(game_manager, this, isManualGame);
-			t= new Thread(gm);
+			GameThread gm = new GameThread(game_manager, this, this.scenario, isManualGame);
+			t = new Thread(gm);
 			game_manager.manualGame(x_location, y_location);
 		}
 	}
@@ -217,10 +256,6 @@ public class MyGameGUI implements ActionListener, MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-//		StdDraw.setCanvasSize(e.getX(), e.getY());
-//		int x_location =(int) StdDraw.userX(e.getX());
-//		int y_location =(int) StdDraw.userY(e.getY());
-//		StdDraw.setCanvasSize(x_location, y_location);
 	}
 
 	@Override
@@ -232,53 +267,45 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		String scenario = "";
 		String action = e.getActionCommand();
 		if (action.equals("Select scenario")) {
-			if(t.isAlive()) {
-				JOptionPane.showMessageDialog(StdDraw.frame, "The game is running, please wait until it ends to run another game.");
+			if (t.isAlive()) {
+				JOptionPane.showMessageDialog(StdDraw.frame,
+						"The game is running, please wait until it ends to run another game.");
 				return;
 			}
-			scenario = (String) JOptionPane.showInputDialog(StdDraw.frame, "Please choose scenario number:",
-					"scenario", JOptionPane.PLAIN_MESSAGE, null, scenarioList, scenarioList[0]);
+			scenario = (String) JOptionPane.showInputDialog(StdDraw.frame, "Please choose scenario number:", "scenario",
+					JOptionPane.PLAIN_MESSAGE, null, scenarioList, scenarioList[0]);
 			try {
 				int scenario_num = Integer.parseInt(scenario);
-				this.scenario=scenario_num;
+				this.scenario = scenario_num;
 				game_manager = new GameManager(scenario_num);
 				initGUI();
-				selectGameOption(scenario_num); // return
+				selectGameOption(scenario_num);
 			} catch (Exception e2) {
-				JOptionPane.showMessageDialog(StdDraw.frame, "this scenario is wrong, should be a number between 0-23",
-						"Error", JOptionPane.ERROR_MESSAGE);
-//				return;
-			}
-		}
-		if (action.equals("Save to KML")) {
-			try {
-				game_manager.getKML().save(""+ this.scenario);
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
+//				System.out.println(e2.getMessage());
 			}
 		}
 	}
 
 	private void selectGameOption(int scenario_num) {
-		int index = JOptionPane.showOptionDialog(StdDraw.frame, "Please choose game option:",
-				"Game Option", JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE, null, gameOption, gameOption[0]);
+		int index = JOptionPane.showOptionDialog(StdDraw.frame, "Please choose game option:", "Game Option",
+				JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE, null, gameOption, gameOption[0]);
 		String gameOp = gameOption[index];
-		if(gameOp.equals("Manual")) {
+		if (gameOp.equals("Manual")) {
 			isManualGame = true;
 			if (game_manager.getRobots().size() == 1) {
 				JOptionPane.showMessageDialog(StdDraw.frame,
 						"Please select a location for 1 robot, please note that after the robot location the game will start immediately\r\n",
 						"", JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				JOptionPane.showMessageDialog(StdDraw.frame, "Please select a location for " + game_manager.getRobots().size()
+				JOptionPane.showMessageDialog(StdDraw.frame, "Please select a location for "
+						+ game_manager.getRobots().size()
 						+ " robots, please note that after the last robot location the game will start immediately\r\n",
 						"", JOptionPane.INFORMATION_MESSAGE);
 			}
-		}else if(gameOp.equals("Automatic")) {
-//			t= new Thread(this);
+		} else if (gameOp.equals("Automatic")) {
 			isManualGame = false;
-			GameThread gm = new GameThread(game_manager, this, isManualGame);
-			t= new Thread(gm);
+			GameThread gm = new GameThread(game_manager, this, this.scenario, isManualGame);
+			t = new Thread(gm);
 			game_manager.automaticGame(scenario_num);
 		}
 	}
@@ -289,7 +316,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	 */
 	public void drawGame() {
 		game_manager.updateFruits(game_manager.getGame().getFruits());
-		game_manager.updateRobots(game_manager.getGame().move());
+		game_manager.updateRobots(game_manager.getGame().getRobots());
 		drawFruits();
 		drawGraph();
 		drawRobots();
@@ -306,6 +333,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		System.out.println(game_manager.getGame().timeToEnd());
 		double rX = rx.get_length() / 20;
 		double rY = ry.get_length() / 15;
+		StdDraw.text((rx.get_max()+rx.get_min())/2, ry.get_max()-2*pixel, "scenario: "+this.scenario);
 		try {
 			JSONObject gameServer = new JSONObject(game_manager.getGame().toString()).getJSONObject("GameServer");
 			result = gameServer.getInt("grade");
@@ -317,83 +345,4 @@ public class MyGameGUI implements ActionListener, MouseListener {
 		StdDraw.text(rx.get_min() - rX + 3.5 * pixel, ry.get_min() - rY + 2 * pixel, "time:" + timeToEnd);
 	}
 
-	/**
-	 * 
-	 */
-//<<<<<<< HEAD
-//	@Override
-//	public void run() {
-//		String results="";
-//		if (isManualGame) {
-//			while (game_manager.getGame().isRunning()) {
-//				game_manager.getGame().move();
-//				StdDraw.clear();
-//				drawGame();
-//				StdDraw.show();
-//				try {
-//					Thread.sleep(80);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//			results = game_manager.getGame().toString();
-//			isManualGame = false;
-//		} else {
-//			while (game_manager.getGame().isRunning()) {
-//					game_manager.autoMoveRobots();
-//					StdDraw.clear();
-//					drawGame();
-//				try {
-//					Thread.sleep(80);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//
-//			}
-//			results = game_manager.getGame().toString();
-//			try {
-//				game_manager.getKML().save(""+ scenario);
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		System.out.println("Game Over: " + results);
-//		JOptionPane.showMessageDialog(StdDraw.frame, "Game Over: " + results, "Game Over", JOptionPane.INFORMATION_MESSAGE);
-//	}
-//=======
-//	@Override
-//	public void run() {
-//		String results="";
-//		if (isManualGame) {
-//			while (game_manager.getGame().isRunning()) {
-//				game_manager.getGame().move();
-//				StdDraw.clear();
-//				drawGame();
-////				StdDraw.show();
-//				try {
-//					Thread.sleep(80);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//			results = game_manager.getGame().toString();
-//			isManualGame = false;
-//		} else {
-//			while (game_manager.getGame().isRunning()) {
-//					game_manager.autoMoveRobots();
-//					StdDraw.clear();
-//					drawGame();
-//				try {
-//					Thread.sleep(80);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//
-//			}
-//			results = game_manager.getGame().toString();
-//		}
-//		System.out.println("Game Over: " + results);
-//		JOptionPane.showMessageDialog(StdDraw.frame, "Game Over: " + results, "Game Over", JOptionPane.INFORMATION_MESSAGE);		
-//	}
-//>>>>>>> 0935e162c7dc9903e24fecee36de41b751467c92
 }
