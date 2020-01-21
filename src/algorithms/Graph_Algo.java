@@ -14,11 +14,10 @@ import dataStructure.node_data;
 
 import utils.MyMinHeap;
 import utils.Point3D;
+
 /**
  * This  class represents the set of graph-theory algorithms.
- *
  */
-
 public class Graph_Algo implements graph_algorithms {
     private DGraph g;
     private boolean isConnected;
@@ -27,18 +26,26 @@ public class Graph_Algo implements graph_algorithms {
     private double dist;
     private List<node_data> path;
 
-    
+    /**
+     * The constructor build empty DGraph and empty ArrayList<node_data>.
+     */
     public Graph_Algo() {
     	g= new DGraph();
     	path=new ArrayList<node_data>();
     }
-    
+    /**
+     * The constructor received graph, build empty DGraph and comparing it to the graph(not deep copy).
+     * @param g
+     */
     public Graph_Algo(graph g) {
     	this.g= new DGraph();
     	this.g = (DGraph) g;
     	path=new ArrayList<node_data>();
     }
-
+    /**
+     * The method return the graph of the class.
+     * @return
+     */
     public graph getGraph() {
     	return g;
     }
@@ -109,7 +116,9 @@ public class Graph_Algo implements graph_algorithms {
 		
 	}
 	
-    //this method paint all the connected nodes to n.
+    /**
+     * this method paint all the connected nodes to n.
+     */
 	private void isConnectedHelper(node_data n) {
 		Collection<edge_data> e= g.getE(n.getKey());
 		for(edge_data i: e) {
@@ -139,7 +148,8 @@ public class Graph_Algo implements graph_algorithms {
 
 	/**
 	 * returns the the shortest path between src to dest - as an ordered List of nodes:
-	 * src--> n1-->n2-->...dest
+	 * src--> n1-->n2-->...dest. the method base on dijkstra algoritm with one change 
+	 * that if the dest node is the root of the minheap the algoritm stop.   
 	 * see: https://en.wikipedia.org/wiki/Shortest_path_problem
 	 * @param src - start node
 	 * @param dest - end (target) node
@@ -190,12 +200,24 @@ public class Graph_Algo implements graph_algorithms {
 		this.paintWhite(v);
 		return this.path;
 	}
+	/**
+	 * The method update mcSP, src, dest and dist bases on last short path check.
+	 * @param dist
+	 * @param src
+	 * @param dest
+	 */
 	private void updateSP(double dist, int src, int dest) {
 		this.mcSP=g.getMC();
 		this.src=src;
 		this.dest=dest;
 		this.dist=dist;
 	}
+	/**
+	 * The method doing initializing for method shortestPath, useful for TSP too.
+	 * @param v
+	 * @param src
+	 * @return ArrayList<node_data> with all the nodes of the graph that have in their info their key, needing for the minheep to now the key of the node.
+	 */
 	private ArrayList<node_data> initForShortestPath(Collection<node_data> v, int src) {
 		ArrayList<node_data> t= new ArrayList<node_data>();
 		for(node_data n: v) {
@@ -210,7 +232,10 @@ public class Graph_Algo implements graph_algorithms {
 		
 		return t;
 	}
-	//the method reverse list l
+	/**
+	 * The method received list l and reversing the list.
+	 * @param l
+	 */
     private void reverse(List<node_data> l) {
     	node_data temp=null;
     	int size=l.size();
@@ -220,7 +245,8 @@ public class Graph_Algo implements graph_algorithms {
 			l.set(size-1-i, temp);
 		}
     }
-    /* The method is changing the weight of node neighbor of the node, that is key is src, 
+    /** 
+     * The method is changing the weight of node neighbor of the node, that is key is src, 
      * if the weight of the src node + the weight of the edge between src node to is neighbor 
      * less then the weight of is neighbor weight.   
      */
@@ -241,7 +267,7 @@ public class Graph_Algo implements graph_algorithms {
 	}
 
 	/**
-	 * computes a relatively short path which visit each node in the targets List.
+	 * Computes a relatively short path which visit each node in the targets List.
 	 * Note: this is NOT the classical traveling salesman problem, 
 	 * as you can visit a node more than once, and there is no need to return to source node - 
 	 * just a simple path going over all nodes in the list. 
@@ -292,7 +318,11 @@ public class Graph_Algo implements graph_algorithms {
 		tsp.addAll(this.shortestPath(temp.get(0), temp.get(1)));
 		return tsp;
 	}
-	
+	/**
+	 * The method received a key node and doing algoritm dijkstra on the graph from this node.
+	 * For information about dijkstra https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm 
+	 * @param src
+	 */
 	private void dijkstras(int src) {
 		Collection<node_data> v= g.getV();
 		ArrayList<node_data> l=initForShortestPath(v,src);
@@ -323,7 +353,13 @@ public class Graph_Algo implements graph_algorithms {
 		return t.getGraph();
 
 	}
-	///the method is changing all value tag in each node to 0
+	/**
+	 * The method is changing all value tag in each node in collection v to 0,
+	 * and return true if all nodes changed from some number to 0 and false if 
+	 * was at list one node that was 0 before.
+	 * @param v
+	 * @return
+	 */
 	private boolean paintWhite(Collection<node_data> v) {
 		//this flag to now if all nodes changed 
 		boolean allNodesChanged=true;
@@ -334,6 +370,14 @@ public class Graph_Algo implements graph_algorithms {
 		    }
 		 return allNodesChanged;
 	}
+	/**
+	 * The method received a point and return the edge that the point on him, if not exist match edge the method return null.
+	 * The algoritm of the method is for each edge of the graph check the distance between the point to the node src of the edge
+	 * and the distance between the point to the node dest of the edge and if sum of the distances - the distance between the src to dest, 
+	 * in absolute value<= epsilon, than this the edge.   
+	 * @param p
+	 * @return
+	 */
 	public edge_data findEdgeToPoint(Point3D p){
 		Collection<node_data> n=this.g.getV();
 		Collection<edge_data> e;
@@ -342,10 +386,6 @@ public class Graph_Algo implements graph_algorithms {
 			e=this.g.getE(t.getKey());
 			for(edge_data j:e) {
 				dest= j.getDest();
-//				if(p.x()<= t.getLocation().x() && p.x()>= this.getNode(dest).getLocation().x()
-//						|| (p.x()>= t.getLocation().x() && p.x()<= this.getNode(dest).getLocation().x() )) {
-//					if()
-//				}
 				if((Math.abs((t.getLocation().distance2D(p)+this.g.getNode(dest).getLocation().distance2D(p))
 					- t.getLocation().distance2D(this.g.getNode(dest).getLocation()))<=Point3D.EPS)) {
 					return j;
