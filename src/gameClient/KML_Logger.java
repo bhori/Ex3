@@ -1,7 +1,11 @@
 package gameClient;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -149,10 +153,19 @@ public class KML_Logger {
 	/**
 	 * The method received a file name and save the kml file with fileName.kml. 
 	 * @param fileName
-	 * @throws FileNotFoundException
+	 * @throws IOException 
 	 */
-	public void save(String fileName) throws FileNotFoundException {
+	public void save(String fileName) throws IOException {
 		// print and save
+//		System.console().toString();
+//		OutputStream out=new OutputStream();
+////		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//		kml.marshal();
+//		while (br.lines().iterator().hasNext()) {
+//		    System.out.println(br.lines().iterator().next());
+//		    break;
+//		}
+//		br.close();
 		kml.marshal(new File(fileName + ".kml"));
 	}
 }

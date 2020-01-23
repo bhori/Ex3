@@ -54,6 +54,14 @@ public class Fruit {
 	   this.dest=dest;
    }
    /**
+    * The method received value and change the value of the fruit to this value.
+    * Needed for sort fruits by their new value. 
+    * @param value
+    */
+   public void setValue(double value) {
+	   this.value=value;
+   }
+   /**
     * The method return the src of the fruit.
     * @return
     */

@@ -10,6 +10,7 @@ import Server.Game_Server;
 import Server.game_service;
 import algorithms.Graph_Algo;
 import dataStructure.DGraph;
+import dataStructure.Edge;
 import dataStructure.Node;
 import dataStructure.edge_data;
 import dataStructure.node_data;
@@ -140,8 +141,8 @@ public class GameManager {
 				robot.setPos(p);
 				i++;
 			}
-			this.game.addRobot(node_id);
 			
+			this.game.addRobot(node_id);
 		}
 	}
 
@@ -345,10 +346,10 @@ public class GameManager {
 	}
 
 	/**
-	 * The method first of all doing the next move in the game, than update the fruits and robots of the class 
-	 * and prepare the next step of each robot.The method sort the fruit in the list by they value the biggest first
-	 * check who the robot that can eat the fruit first, and this robot go to the fruit, 
-	 * and the same check for the fruits that left with the robots that left. 
+	 * The method first of all doing the next move in the game, 
+	 * than for each robot sort the fruit according to fruit value and the shortest path to him,
+	 * then choosing the next move for this robot,  
+	 * and the same check for the robots that left with the fruits  that left. 
 	 */
 	public void autoMoveRobots() {
 		List<String> log = game.move();
@@ -356,9 +357,6 @@ public class GameManager {
 		if (log != null) {
 			updateFruits(game.getFruits());
 			updateRobots(log);
-			double minTimeToGet;
-			Robot minRob = null;
-			double timeToGet;
 			sortFruits();
 			long tEnd = game.timeToEnd();
 			int tSec=(int)(tEnd / 500);
@@ -371,40 +369,24 @@ public class GameManager {
 				    k.addRobotPlace(robot.getPos().x(), robot.getPos().y(), robot.getId());
 				timeForKML=tSec;
 			}
-			// find the short time between the robots to the fruit(the fruits organize in
-			// order to the value of the fruits, the biggest value first)
-			for (Fruit fruit : f) {
-				if (fruit.getSrc() != -1) {
-					minTimeToGet = Integer.MAX_VALUE;
-					for (Robot robot : r) {
-						if (robot.getDest() == -1) {
-							timeToGet = (g.getEdge(fruit.getSrc(), fruit.getDest()).getWeight()
-									+ new Graph_Algo(g).shortestPathDist(robot.getSrc(),
-											fruit.getSrc()))
-									/ robot.getSpeed();
-							if (timeToGet < minTimeToGet) {
-								minTimeToGet = timeToGet;
-								minRob = robot;
-							}
+			for (Robot robot : r) {
+					for (Fruit fruit : f) {
+							if(fruit.getValue()!=-1) 
+								fruit.setValue(fruit.getValue()/new Graph_Algo(g).shortestPathDist(robot.getSrc(),fruit.getDest()));
 						}
-					}
-					// if left time to eat this fruit
-					if (minTimeToGet <= tEnd) {
-						// if have robots that came to src of some fruit, eat the fruit.
-						if (minRob.getSrc() == fruit.getSrc()) {
-							game.chooseNextEdge(minRob.getId(), fruit.getDest());
-						} else {
-							int dest = new Graph_Algo(g).shortestPath(minRob.getSrc(), fruit.getSrc())
-									.get(1).getKey();
-							game.chooseNextEdge(minRob.getId(), dest);
-							minRob.setDest(dest);
-							fruit.setSrc(-1);
+					sortFruits();
+					//if the robot on the edge of his fruit eat the fruit
+					if (robot.getSrc() == f.get(0).getSrc()) {
+							game.chooseNextEdge(robot.getId(), f.get(0).getDest());
+							f.get(0).setValue(-1);
+					}else {
+							int dest = new Graph_Algo(g).shortestPath(robot.getSrc(), f.get(0).getSrc()).get(1).getKey();
+							game.chooseNextEdge(robot.getId(), dest);
+							robot.setDest(dest);
+							f.get(0).setValue(-1);
 						}
 					}
 				}
-			}
-
-		}
 	}
 
 	/**

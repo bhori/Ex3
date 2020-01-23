@@ -1,6 +1,7 @@
 package gameClient;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
@@ -82,7 +83,7 @@ public class GameThread implements Runnable {
 					gui.drawGame();
 				}
 				try {
-					Thread.sleep(97);
+				  Thread.sleep(86);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -99,6 +100,8 @@ public class GameThread implements Runnable {
 				gm.getKML().save("" + this.scenario);
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
