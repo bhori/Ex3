@@ -20,11 +20,11 @@ public class SimpleDB {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-			int id1 = 305688111;  // "real" existing ID & KML
+			int id1 = 312488596;  // "real" existing ID & KML
 			int id2 = 12345678;
 			int level = 0;//1,2,3
 			printLog(id1);
-			//allUsers();	
+//			allUsers();	
 			//String kml1 = getKML(id1,level);
 			System.out.println("***** KML1 file example: ******");
 			//System.out.println(kml1);
@@ -39,6 +39,7 @@ public class SimpleDB {
 						DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
 				Statement statement = connection.createStatement();
 				String allCustomersQuery = "SELECT * FROM Logs where userID="+id;
+//				String allCustomersQuery = "SELECT * FROM Logs where levelID="+0;
 			
 				ResultSet resultSet = statement.executeQuery(allCustomersQuery);
 				int ind =0;

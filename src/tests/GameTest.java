@@ -9,7 +9,6 @@ import gameClient.MyGameGUI;
 public class GameTest {
 
 	public static void main(String[] args) {
-		//Game_Server.login(305688111);
 		MyGameGUI s = new MyGameGUI();
 	}
 
