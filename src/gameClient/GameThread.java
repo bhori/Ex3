@@ -83,6 +83,7 @@ public class GameThread implements Runnable {
 					gui.drawGame();
 				}
 				try {
+					
 				  Thread.sleep(40);
 				} catch (InterruptedException e) {
 					e.printStackTrace();

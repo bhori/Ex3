@@ -12,6 +12,7 @@ import gameClient.MyGameGUI;
 
 public class GameTest {
 
+
 	public static void main(String[] args) throws FileNotFoundException  {
 		Game_Server.login(305688111);
 		//MyGameGUI s = new MyGameGUI();
