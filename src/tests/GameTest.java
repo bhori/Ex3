@@ -14,10 +14,10 @@ public class GameTest {
 
 
 	public static void main(String[] args) throws FileNotFoundException  {
-		Game_Server.login(305688111);
-		//MyGameGUI s = new MyGameGUI();
-		GameManager g=new GameManager(-31);
-		g.automaticGame();
+//		Game_Server.login(305688111);
+		MyGameGUI s = new MyGameGUI();
+//		GameManager g=new GameManager(-31);
+//		g.automaticGame();
 	}
 		
 

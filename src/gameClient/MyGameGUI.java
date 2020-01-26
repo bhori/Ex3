@@ -369,6 +369,8 @@ public class MyGameGUI implements ActionListener, MouseListener {
 			}
 			int index = JOptionPane.showOptionDialog(StdDraw.frame, "Please choose option:", "Info Option",
 					JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE, null, infoOption, infoOption[0]);
+			if(index<0 || index>3)
+				return;
 			String info = infoOption[index];
 			if (info.equals("All games playd")) {
 				JOptionPane.showMessageDialog(StdDraw.frame, "Number of games playd: " + numOfGames(id),
