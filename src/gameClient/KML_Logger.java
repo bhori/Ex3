@@ -125,7 +125,7 @@ public class KML_Logger {
 		}
 		//if robot
 		else if(time==true){
-			id=""+Integer.parseInt(id)%3;//for id bigger then 10.
+			id=""+Integer.parseInt(id)%10;//for id bigger then 10.
 			icon.withHref("http://pngimg.com/uploads/robot/robot_PNG3"+ id+ ".png");
 			style.withId("style_" + id) 
 		    .createAndSetIconStyle().withScale(1).withIcon(icon); 
@@ -157,15 +157,6 @@ public class KML_Logger {
 	 */
 	public void save(String fileName) throws IOException {
 		// print and save
-//		System.console().toString();
-//		OutputStream out=new OutputStream();
-////		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//		kml.marshal();
-//		while (br.lines().iterator().hasNext()) {
-//		    System.out.println(br.lines().iterator().next());
-//		    break;
-//		}
-//		br.close();
 		kml.marshal(new File(fileName + ".kml"));
 	}
 }
