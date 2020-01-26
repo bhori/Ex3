@@ -99,10 +99,14 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	// scenario list, used for selecting scenario from that list.
 	private String[] scenarioList = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14",
 			"15", "16", "17", "18", "19", "20", "21", "22", "23" };
-	// options for the game, used for the window that opened after the user selected
-	// scenario.
+	// options for the game, used for the window that opened after the user selected scenario.
 	private String[] gameOption = { "Manual", "Automatic" };
 	private String[] infoOption = { "All games playd", "Level playd", "Best results", "My place in class"};
+	//The maximum amount of steps allowed for each stage.
+	private int[] moves = { 290, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 500, Integer.MAX_VALUE, Integer.MAX_VALUE,
+			Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE,
+			Integer.MAX_VALUE, 290, Integer.MAX_VALUE, Integer.MAX_VALUE, 580, 290, Integer.MAX_VALUE,
+			Integer.MAX_VALUE, 1140 };
 	// Colors for the robots.
 	public static Color[] Colors = { Color.RED, Color.CYAN, Color.ORANGE, Color.PINK, Color.MAGENTA };
 	public static final String jdbcUrl = "jdbc:mysql://db-mysql-ams3-67328-do-user-4468260-0.db.ondigitalocean.com:25060/oop?useUnicode=yes&characterEncoding=UTF-8&useSSL=false";
@@ -386,7 +390,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 				bestResults(id, score);
 				String res = "";
 				for (int i = 0; i < score.length; i++) {
-					res+=i+") "+score[i]+"\n";
+					res+="Level "+i+") "+score[i]+"\n";
 				}
 				JOptionPane.showMessageDialog(StdDraw.frame, res, "results", JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -397,7 +401,7 @@ public class MyGameGUI implements ActionListener, MouseListener {
 				placeInClass(id, score, place);
 				String res = "";
 				for (int i = 0; i < place.length; i++) {
-					res+=i+") "+place[i]+"\n";
+					res+="Level "+i+") "+place[i]+"\n";
 				}
 				JOptionPane.showMessageDialog(StdDraw.frame, res, "results", JOptionPane.INFORMATION_MESSAGE);
 			}	
@@ -521,10 +525,6 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	}
 
 	private void bestResults(int id, int [] score) {
-		int[] moves = { 290, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 500, Integer.MAX_VALUE, Integer.MAX_VALUE,
-				Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE,
-				Integer.MAX_VALUE, 290, Integer.MAX_VALUE, Integer.MAX_VALUE, 580, 290, Integer.MAX_VALUE,
-				Integer.MAX_VALUE, 1140 };
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
@@ -551,10 +551,6 @@ public class MyGameGUI implements ActionListener, MouseListener {
 	}
 	
 	private void placeInClass(int id, int [] score, int [] place) {
-		int[] moves = { 290, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 500, Integer.MAX_VALUE, Integer.MAX_VALUE,
-				Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE, 580, Integer.MAX_VALUE,
-				Integer.MAX_VALUE, 290, Integer.MAX_VALUE, Integer.MAX_VALUE, 580, 290, Integer.MAX_VALUE,
-				Integer.MAX_VALUE, 1140 };
 		int count=1;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
