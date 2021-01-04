@@ -1,4 +1,4 @@
-# Welcome to project Ex3 about a client side in a game on directed graph
+# Maze of Waze - The game
 
 This repository represents a client side to a game, In this game there is a server that enables to load a scenario between 0 and 23,
 in each scenario there is a graph, fruits and robots, each fruit has a value and position on the graph edges and each robot has a position on the graph.
